@@ -13,7 +13,7 @@ export default function Main() {
   };
 
   return (
-    <div className="relative z-10 container max-w-6xl mx-auto mt-10 lg:mt-20">
+    <div className="relative z-10 container max-w-6xl px-6 lg:px-0 mx-auto mt-10 lg:mt-20">
       <div className="grid lg:grid-cols-2 gap-12 lg:gap-0 items-center ">
         
         {/* Left Content */}
