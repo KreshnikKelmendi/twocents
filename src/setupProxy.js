@@ -4,22 +4,19 @@ module.exports = function(app) {
   app.use(
     '/api',
     createProxyMiddleware({
-      target: 'https://api.twocents.money',
+      target: 'https://api.twocents.money/prod',
       changeOrigin: true,
       pathRewrite: {
-        '^/api': '', // remove /api prefix when forwarding to target
+        '^/api': '', // Remove /api prefix when forwarding to target
       },
       onProxyReq: (proxyReq, req, res) => {
-        // Log the proxy request for debugging
-        console.log('🔄 PROXY: Forwarding request to:', proxyReq.path);
+        console.log('Proxying request to:', proxyReq.path);
       },
       onProxyRes: (proxyRes, req, res) => {
-        // Log the proxy response for debugging
-        console.log('🔄 PROXY: Received response with status:', proxyRes.statusCode);
+        console.log('Proxy response status:', proxyRes.statusCode);
       },
       onError: (err, req, res) => {
-        // Log proxy errors
-        console.log('❌ PROXY ERROR:', err.message);
+        console.error('Proxy error:', err.message);
       }
     })
   );

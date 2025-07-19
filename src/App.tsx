@@ -5,22 +5,26 @@ import Main from './components/main/Main';
 import FeaturesSection from './components/FeaturesSection/FeaturesSection';
 import Feed from './components/Feed/Feed';
 import PostDetail from './components/PostDetail/PostDetail';
+import Footer from './components/Footer/Footer';
 
 function App() {
   return (
     <Router>
-      <div className=" bg-gradient-to-br from-[#302209] via-[#302209] to-[#302209] pt-6">
+      <div className="min-h-screen flex flex-col bg-gradient-to-br from-[#302209] via-[#302209] to-[#302209] pt-6">
         <Header />
-        <Routes>
-          <Route path="/" element={
-            <>
-              <Main />
-              <FeaturesSection />
-              <Feed />
-            </>
-          } />
-          <Route path="/post/:postId" element={<PostDetail />} />
-        </Routes>
+        <main className="flex-1">
+          <Routes>
+            <Route path="/" element={
+              <>
+                <Main />
+                <FeaturesSection />
+                <Feed />
+              </>
+            } />
+            <Route path="/post/:postId" element={<PostDetail />} />
+          </Routes>
+        </main>
+        <Footer />
       </div>
     </Router>
   );

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { motion, easeOut } from "framer-motion";
 
 export default function Main() {
   const [email, setEmail] = useState("");
@@ -12,6 +13,44 @@ export default function Main() {
     }
   };
 
+  // Animation variants for word-by-word animation
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+        delayChildren: 0.3,
+      },
+    },
+  };
+
+  const wordVariants = {
+    hidden: { 
+      opacity: 0, 
+      y: 20,
+      scale: 0.8
+    },
+    visible: { 
+      opacity: 1, 
+      y: 0,
+      scale: 1,
+      transition: {
+        duration: 0.6,
+        ease: easeOut,
+      }
+    },
+  };
+
+  // Split the text into words while preserving line breaks
+  const headingWords = [
+    { text: "YOUR", className: "text-white/10 lg:block" },
+    { text: "USERNAME", className: "bg-gradient-to-r from-[#744608] to-[#7c5f0c] bg-clip-text text-transparent lg:block" },
+    { text: "IS YOUR", className: "text-white/10 lg:block" },
+    { text: "NET", className: "bg-gradient-to-r from-[#744608] to-[#7c5f0c] bg-clip-text text-transparent lg:block" },
+    { text: "WORTH.", className: "bg-gradient-to-r from-orange-400 to-yellow-500 bg-clip-text text-transparent lg:block" },
+  ];
+
   return (
     <div className="relative z-10 container max-w-6xl px-6 lg:px-0 mx-auto mt-10 lg:mt-20">
       <div className="grid lg:grid-cols-2 gap-12 lg:gap-0 items-center ">
@@ -19,13 +58,22 @@ export default function Main() {
         {/* Left Content */}
         <div className="space-y-6 lg:space-y-8">
           <div className="space-y-4">
-            <h1 className="text-5xl lg:text-8xl font-inter font-extrabold leading-tighter tracking-[2px]">
-              <span className="text-white/10 lg:block">YOUR </span>
-              <span className="bg-gradient-to-r from-[#744608] to-[#7c5f0c] bg-clip-text text-transparent lg:block">USERNAME </span>
-              <span className="text-white/10 lg:block">IS YOUR </span>
-              <span className="bg-gradient-to-r from-[#744608] to-[#7c5f0c] bg-clip-text text-transparent lg:block">NET </span>
-              <span className="bg-gradient-to-r from-orange-400 to-yellow-500 bg-clip-text text-transparent lg:block">WORTH<span className="text-white/10">.</span></span>
-            </h1>
+            <motion.h1 
+              className="text-5xl lg:text-8xl font-inter font-extrabold leading-tighter tracking-[2px]"
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+            >
+              {headingWords.map((word, index) => (
+                <motion.span
+                  key={index}
+                  className={word.className}
+                  variants={wordVariants}
+                >
+                  {word.text}{" "}
+                </motion.span>
+              ))}
+            </motion.h1>
           </div>
 
           {/* Sign up buttons */}
