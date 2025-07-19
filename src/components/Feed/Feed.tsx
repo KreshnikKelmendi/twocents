@@ -106,8 +106,8 @@ const Feed: React.FC = () => {
     <div className="container max-w-6xl mx-auto px-6">
       {/* Header */}
       <div className="text-center mb-8">
-        <h2 className="text-4xl font-bold text-white mb-2">TwoCents Feed</h2>
-        <p className="text-white/60 text-lg">Discover the most engaging posts from our community</p>
+        <h2 className="text-4xl font-bold font-inter text-[#FEF4C8] mb-2">TwoCents Feed</h2>
+        <p className="text-sm font-inter w-60 mx-auto lg:w-full text-[#FEF4C8]">Discover the most engaging posts from our community</p>
       </div>
 
       {/* Filter Selection */}

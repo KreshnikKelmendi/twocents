@@ -98,28 +98,40 @@ const Header = () => {
                 <a 
                   href="#" 
                   className="text-white hover:text-amber-200 transition-colors duration-300 font-inter py-2 border-b border-amber-200/20"
-                  onClick={() => setIsMenuOpen(false)}
+                  onClick={() => {
+                    setIsMenuOpen(false)
+                    window.scrollTo({ top: 0, behavior: 'smooth' })
+                  }}
                 >
                   Home
                 </a>
                 <a 
                   href="#" 
                   className="text-white hover:text-amber-200 transition-colors duration-300 font-inter py-2 border-b border-amber-200/20"
-                  onClick={() => setIsMenuOpen(false)}
+                  onClick={() => {
+                    setIsMenuOpen(false)
+                    window.scrollTo({ top: 0, behavior: 'smooth' })
+                  }}
                 >
                   About Us
                 </a>
                 <a 
                   href="#" 
                   className="text-white hover:text-amber-200 transition-colors duration-300 font-inter py-2 border-b border-amber-200/20"
-                  onClick={() => setIsMenuOpen(false)}
+                  onClick={() => {
+                    setIsMenuOpen(false)
+                    window.scrollTo({ top: 0, behavior: 'smooth' })
+                  }}
                 >
                   Blog
                 </a>
                 <a 
                   href="#" 
                   className="text-white hover:text-amber-200 transition-colors duration-300 font-inter py-2"
-                  onClick={() => setIsMenuOpen(false)}
+                  onClick={() => {
+                    setIsMenuOpen(false)
+                    window.scrollTo({ top: 0, behavior: 'smooth' })
+                  }}
                 >
                   Profile
                 </a>
@@ -205,30 +217,42 @@ const Header = () => {
               <a 
                 href="#" 
                 className="text-white hover:text-amber-200 transition-colors duration-300 font-inter py-2 border-b border-amber-200/20"
-                onClick={() => setIsMenuOpen(false)}
+                onClick={() => {
+                  setIsMenuOpen(false)
+                  window.scrollTo({ top: 0, behavior: 'smooth' })
+                }}
               >
-                Lorem Ipsum
+                Home
               </a>
               <a 
                 href="#" 
                 className="text-white hover:text-amber-200 transition-colors duration-300 font-inter py-2 border-b border-amber-200/20"
-                onClick={() => setIsMenuOpen(false)}
+                onClick={() => {
+                  setIsMenuOpen(false)
+                  window.scrollTo({ top: 0, behavior: 'smooth' })
+                }}
               >
-                Dolor Sit
+                About Us
               </a>
               <a 
                 href="#" 
                 className="text-white hover:text-amber-200 transition-colors duration-300 font-inter py-2 border-b border-amber-200/20"
-                onClick={() => setIsMenuOpen(false)}
+                onClick={() => {
+                  setIsMenuOpen(false)
+                  window.scrollTo({ top: 0, behavior: 'smooth' })
+                }}
               >
-                Amet Consectetur
+                Blog
               </a>
               <a 
                 href="#" 
                 className="text-white hover:text-amber-200 transition-colors duration-300 font-inter py-2"
-                onClick={() => setIsMenuOpen(false)}
+                onClick={() => {
+                  setIsMenuOpen(false)
+                  window.scrollTo({ top: 0, behavior: 'smooth' })
+                }}
               >
-                Elit Sed
+                Profile
               </a>
             </div>
           </nav>

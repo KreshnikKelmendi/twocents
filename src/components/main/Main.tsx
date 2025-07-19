@@ -59,7 +59,7 @@ export default function Main() {
         <div className="space-y-6 lg:space-y-8">
           <div className="space-y-4">
             <motion.h1 
-              className="text-5xl lg:text-8xl font-inter font-extrabold leading-tighter tracking-[2px]"
+              className="text-5xl lg:text-8xl font-inter font-extrabold leading-tighter lg:tracking-[2px]"
               variants={containerVariants}
               initial="hidden"
               animate="visible"

@@ -26,7 +26,7 @@ const FeaturesSection = () => {
   ];
 
   return (
-    <div className="relative z-10 container max-w-6xl mx-auto px-6 lg:px-0 py-12 lg:py-36">
+    <div className="relative z-10 container max-w-6xl mx-auto px-6 lg:px-0 py-24 lg:py-36">
       {/* Feature Highlights */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-12 mb-20">
         {features.map((feature, index) => {
@@ -34,7 +34,7 @@ const FeaturesSection = () => {
           return (
             <div key={index} className="text-center">
               <div className="flex justify-center mb-4">
-                <div className="w-16 h-16 lg:w-20 lg:h-20 flex items-center justify-center text-white">
+                <div className="w-16 h-16 lg:w-20 lg:h-20 flex items-center justify-center text-[#FEF4C8]">
                   <IconComponent size={52} />
                 </div>
               </div>
