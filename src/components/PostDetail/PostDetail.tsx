@@ -1,27 +1,29 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { fetchPost, fetchPoll, Post, Comment, Poll, useVoteState } from '../../utils/api';
+import { fetchPost, fetchPoll, fetchComments, Post, Comment, Poll, useVoteState } from '../../utils/api';
 
 const PostDetail: React.FC = () => {
   const { postId } = useParams<{ postId: string }>();
   const navigate = useNavigate();
   const [post, setPost] = useState<Post | null>(null);
   const [poll, setPoll] = useState<Poll | null>(null);
+  const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { markAsViewed } = useVoteState();
 
-  const loadPost = async () => {
+  const loadPost = useCallback(async () => {
     if (!postId) return;
     
     try {
       setLoading(true);
       setError(null);
       
-      // Fetch post and poll in parallel
-      const [postData, pollData] = await Promise.allSettled([
+      // Fetch post, poll, and comments in parallel
+      const [postData, pollData, commentsData] = await Promise.allSettled([
         fetchPost(postId),
-        fetchPoll(postId)
+        fetchPoll(postId),
+        fetchComments(postId)
       ]);
       
       if (postData.status === 'fulfilled') {
@@ -36,17 +38,26 @@ const PostDetail: React.FC = () => {
       }
       // Poll is optional, so we don't throw if it fails
       
+      if (commentsData.status === 'fulfilled') {
+        console.log('Comments data:', commentsData.value);
+        setComments(commentsData.value);
+      } else {
+        console.warn('Failed to fetch comments:', commentsData.reason);
+        setComments([]);
+      }
+      // Comments are optional, so we don't throw if it fails
+      
     } catch (err: any) {
       setError(`Failed to load post: ${err.message}`);
       setPost(null);
     } finally {
       setLoading(false);
     }
-  };
+  }, [postId, markAsViewed]);
 
   useEffect(() => {
     loadPost();
-  }, [postId]);
+  }, [postId, loadPost]);
 
   const formatNetWorth = (netWorth: number) => {
     const worth = netWorth || 0;
@@ -221,6 +232,8 @@ const PostDetail: React.FC = () => {
     );
   }
 
+  console.log('Comments state:', comments);
+  
   return (
     <div className="h-screen flex flex-col">
       {/* Header */}
@@ -273,9 +286,9 @@ const PostDetail: React.FC = () => {
             <h3 className="text-white text-2xl font-bold mb-6 bg-gradient-to-r from-orange-400 to-yellow-400 bg-clip-text text-transparent">
               Comments ({(post.comment_count || 0)})
             </h3>
-            {post.comments && post.comments.length > 0 ? (
+            {comments && comments.length > 0 ? (
               <div className="space-y-4">
-                {post.comments.map((comment) => (
+                {comments.map((comment) => (
                   <CommentComponent key={comment.uuid} comment={comment} />
                 ))}
               </div>

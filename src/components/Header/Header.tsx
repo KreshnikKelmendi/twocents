@@ -46,18 +46,30 @@ const Header = () => {
 
               {/* Desktop Menu */}
               <nav className="flex items-center space-x-8">
-                <a href="#" className="text-white hover:text-amber-200 transition-colors duration-300 font-inter">
+                <button 
+                  onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                  className="text-white hover:text-amber-200 transition-colors duration-300 font-inter bg-transparent border-none cursor-pointer"
+                >
                   Home
-                </a>
-                <a href="#" className="text-white hover:text-amber-200 transition-colors duration-300 font-inter">
-                About Us
-                </a>
-                <a href="#" className="text-white hover:text-amber-200 transition-colors duration-300 font-inter">
-                Blog
-                </a>
-                <a href="#" className="text-white hover:text-amber-200 transition-colors duration-300 font-inter">
-                Profile
-                </a>
+                </button>
+                <button 
+                  onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                  className="text-white hover:text-amber-200 transition-colors duration-300 font-inter bg-transparent border-none cursor-pointer"
+                >
+                  About Us
+                </button>
+                <button 
+                  onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                  className="text-white hover:text-amber-200 transition-colors duration-300 font-inter bg-transparent border-none cursor-pointer"
+                >
+                  Blog
+                </button>
+                <button 
+                  onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                  className="text-white hover:text-amber-200 transition-colors duration-300 font-inter bg-transparent border-none cursor-pointer"
+                >
+                  Profile
+                </button>
               </nav>
             </div>
 
@@ -95,46 +107,42 @@ const Header = () => {
           {isMenuOpen && (
             <nav className="md:hidden mt-4 bg-black/20 backdrop-blur-sm rounded-lg border border-amber-200/20 p-4">
               <div className="flex flex-col space-y-4">
-                <a 
-                  href="#" 
-                  className="text-white hover:text-amber-200 transition-colors duration-300 font-inter py-2 border-b border-amber-200/20"
+                <button 
+                  className="text-white hover:text-amber-200 transition-colors duration-300 font-inter py-2 border-b border-amber-200/20 bg-transparent border-none cursor-pointer text-left"
                   onClick={() => {
                     setIsMenuOpen(false)
                     window.scrollTo({ top: 0, behavior: 'smooth' })
                   }}
                 >
                   Home
-                </a>
-                <a 
-                  href="#" 
-                  className="text-white hover:text-amber-200 transition-colors duration-300 font-inter py-2 border-b border-amber-200/20"
+                </button>
+                <button 
+                  className="text-white hover:text-amber-200 transition-colors duration-300 font-inter py-2 border-b border-amber-200/20 bg-transparent border-none cursor-pointer text-left"
                   onClick={() => {
                     setIsMenuOpen(false)
                     window.scrollTo({ top: 0, behavior: 'smooth' })
                   }}
                 >
                   About Us
-                </a>
-                <a 
-                  href="#" 
-                  className="text-white hover:text-amber-200 transition-colors duration-300 font-inter py-2 border-b border-amber-200/20"
+                </button>
+                <button 
+                  className="text-white hover:text-amber-200 transition-colors duration-300 font-inter py-2 border-b border-amber-200/20 bg-transparent border-none cursor-pointer text-left"
                   onClick={() => {
                     setIsMenuOpen(false)
                     window.scrollTo({ top: 0, behavior: 'smooth' })
                   }}
                 >
                   Blog
-                </a>
-                <a 
-                  href="#" 
-                  className="text-white hover:text-amber-200 transition-colors duration-300 font-inter py-2"
+                </button>
+                <button 
+                  className="text-white hover:text-amber-200 transition-colors duration-300 font-inter py-2 bg-transparent border-none cursor-pointer text-left"
                   onClick={() => {
                     setIsMenuOpen(false)
                     window.scrollTo({ top: 0, behavior: 'smooth' })
                   }}
                 >
                   Profile
-                </a>
+                </button>
               </div>
             </nav>
           )}
@@ -163,18 +171,30 @@ const Header = () => {
 
             {/* Desktop Menu */}
             <nav className="flex items-center space-x-8">
-              <a href="#" className="text-white hover:text-amber-200 transition-colors duration-300 font-inter">
+              <button 
+                onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                className="text-white hover:text-amber-200 transition-colors duration-300 font-inter bg-transparent border-none cursor-pointer"
+              >
                 Lorem Ipsum
-              </a>
-              <a href="#" className="text-white hover:text-amber-200 transition-colors duration-300 font-inter">
+              </button>
+              <button 
+                onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                className="text-white hover:text-amber-200 transition-colors duration-300 font-inter bg-transparent border-none cursor-pointer"
+              >
                 Lorem Ipsum
-              </a>
-              <a href="#" className="text-white hover:text-amber-200 transition-colors duration-300 font-inter">
+              </button>
+              <button 
+                onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                className="text-white hover:text-amber-200 transition-colors duration-300 font-inter bg-transparent border-none cursor-pointer"
+              >
                 Amet Consectetur
-              </a>
-              <a href="#" className="text-white hover:text-amber-200 transition-colors duration-300 font-inter">
+              </button>
+              <button 
+                onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                className="text-white hover:text-amber-200 transition-colors duration-300 font-inter bg-transparent border-none cursor-pointer"
+              >
                 Elit Sed
-              </a>
+              </button>
             </nav>
           </div>
 
@@ -214,46 +234,42 @@ const Header = () => {
         {isMenuOpen && (
           <nav className="md:hidden mt-4 bg-black/20 backdrop-blur-sm rounded-lg border border-amber-200/20 p-4">
             <div className="flex flex-col space-y-4">
-              <a 
-                href="#" 
-                className="text-white hover:text-amber-200 transition-colors duration-300 font-inter py-2 border-b border-amber-200/20"
+              <button 
+                className="text-white hover:text-amber-200 transition-colors duration-300 font-inter py-2 border-b border-amber-200/20 bg-transparent border-none cursor-pointer text-left"
                 onClick={() => {
                   setIsMenuOpen(false)
                   window.scrollTo({ top: 0, behavior: 'smooth' })
                 }}
               >
                 Home
-              </a>
-              <a 
-                href="#" 
-                className="text-white hover:text-amber-200 transition-colors duration-300 font-inter py-2 border-b border-amber-200/20"
+              </button>
+              <button 
+                className="text-white hover:text-amber-200 transition-colors duration-300 font-inter py-2 border-b border-amber-200/20 bg-transparent border-none cursor-pointer text-left"
                 onClick={() => {
                   setIsMenuOpen(false)
                   window.scrollTo({ top: 0, behavior: 'smooth' })
                 }}
               >
                 About Us
-              </a>
-              <a 
-                href="#" 
-                className="text-white hover:text-amber-200 transition-colors duration-300 font-inter py-2 border-b border-amber-200/20"
+              </button>
+              <button 
+                className="text-white hover:text-amber-200 transition-colors duration-300 font-inter py-2 border-b border-amber-200/20 bg-transparent border-none cursor-pointer text-left"
                 onClick={() => {
                   setIsMenuOpen(false)
                   window.scrollTo({ top: 0, behavior: 'smooth' })
                 }}
               >
                 Blog
-              </a>
-              <a 
-                href="#" 
-                className="text-white hover:text-amber-200 transition-colors duration-300 font-inter py-2"
+              </button>
+              <button 
+                className="text-white hover:text-amber-200 transition-colors duration-300 font-inter py-2 bg-transparent border-none cursor-pointer text-left"
                 onClick={() => {
                   setIsMenuOpen(false)
                   window.scrollTo({ top: 0, behavior: 'smooth' })
                 }}
               >
                 Profile
-              </a>
+              </button>
             </div>
           </nav>
         )}

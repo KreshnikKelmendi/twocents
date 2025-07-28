@@ -237,6 +237,10 @@ export class TwoCentsAPI {
     return this.call<PollResponse>('/v1/polls/get', { post_uuid: postUUID });
   }
 
+  async getComments(postUUID: string): Promise<{ comments: Comment[] }> {
+    return this.call<{ comments: Comment[] }>('/v1/comments/get', { post_uuid: postUUID });
+  }
+
   // Generic JSON-RPC call method
   private async call<T>(method: string, parameters: Record<string, any> = {}): Promise<T> {
     const mutableParams = { ...parameters };
@@ -299,6 +303,7 @@ export const fetchPosts = async (filter: TwoCentsFilter = TwoCentsFilter.TOP_ALL
 export const fetchPost = async (uuid: string): Promise<Post> => {
   try {
     const response = await api.getPost(uuid);
+    console.log('Post API response:', response);
     return response.post;
   } catch (error) {
     console.error('Failed to fetch post:', error);
@@ -312,6 +317,17 @@ export const fetchPoll = async (postUUID: string): Promise<Poll> => {
     return response.poll;
   } catch (error) {
     console.error('Failed to fetch poll:', error);
+    throw error;
+  }
+};
+
+export const fetchComments = async (postUUID: string): Promise<Comment[]> => {
+  try {
+    const response = await api.getComments(postUUID);
+    console.log('Comments API response:', response);
+    return response.comments || [];
+  } catch (error) {
+    console.error('Failed to fetch comments:', error);
     throw error;
   }
 };

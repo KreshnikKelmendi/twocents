@@ -6,20 +6,18 @@ const Feed: React.FC = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedFilter, setSelectedFilter] = useState<TwoCentsFilter>(TwoCentsFilter.TOP_ALL_TIME);
   const [currentPage, setCurrentPage] = useState(1);
   const postsPerPage = 15;
-  const [showMobileFilters, setShowMobileFilters] = useState(false);
   const navigate = useNavigate();
   const { isUpvoted, isDownvoted, isViewed } = useVoteState();
 
-  const fetchPostsData = async (filter: TwoCentsFilter = TwoCentsFilter.TOP_ALL_TIME) => {
+  const fetchPostsData = async () => {
     try {
       setLoading(true);
       setError(null);
-      const apiPosts = await fetchPosts(filter);
+      const apiPosts = await fetchPosts(TwoCentsFilter.TOP_ALL_TIME);
       setPosts(apiPosts.slice(0, 100));
-      setCurrentPage(1); // Reset to first page when filter changes
+      setCurrentPage(1);
     } catch (err: any) {
       setError(`Failed to load posts: ${err.message}`);
       setPosts([]);
@@ -29,12 +27,8 @@ const Feed: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchPostsData(selectedFilter);
-  }, [selectedFilter]);
-
-  const handleFilterChange = (filter: TwoCentsFilter) => {
-    setSelectedFilter(filter);
-  };
+    fetchPostsData();
+  }, []);
 
   const handlePostClick = (postId: string) => {
     navigate(`/post/${postId}`);
@@ -42,16 +36,7 @@ const Feed: React.FC = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const formatNetWorth = (netWorth: number) => {
-    const worth = netWorth || 0;
-    if (worth >= 1000000) {
-      return `$${(worth / 1000000).toFixed(1)}M`;
-    } else if (worth >= 1000) {
-      return `$${(worth / 1000).toFixed(1)}K`;
-    } else {
-      return `$${worth.toLocaleString()}`;
-    }
-  };
+
 
   const getInitials = (username: string) => {
     if (!username || typeof username !== 'string') {
@@ -75,6 +60,13 @@ const Feed: React.FC = () => {
       isDownvoted: isDownvoted(postId),
       isViewed: isViewed(postId)
     };
+  };
+
+  const truncateText = (text: string, maxWords: number = 250) => {
+    if (!text) return '';
+    const words = text.split(' ');
+    if (words.length <= maxWords) return text;
+    return words.slice(0, maxWords).join(' ') + '...';
   };
 
   // Pagination calculations
@@ -103,91 +95,18 @@ const Feed: React.FC = () => {
   }
 
   return (
-    <div className="container max-w-6xl mx-auto px-6">
+    <div className="container max-w-6xl mx-auto px-6 lg:px-0">
       {/* Header */}
-      <div className="text-center mb-8">
-        <h2 className="text-4xl font-bold font-inter text-[#FEF4C8] mb-2">TwoCents Feed</h2>
-        <p className="text-sm font-inter w-60 mx-auto lg:w-full text-[#FEF4C8]">Discover the most engaging posts from our community</p>
-      </div>
+     
 
-      {/* Filter Selection */}
-      <div className="flex justify-center mb-8">
-        {/* Mobile Filter Button */}
-        <div className="sm:hidden w-full max-w-xs">
-          <button
-            onClick={() => setShowMobileFilters(!showMobileFilters)}
-            className="w-full bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl px-4 py-3 text-white/80 hover:text-white hover:bg-white/10 transition-all duration-300 flex items-center justify-between"
-          >
-            <span className="text-sm font-medium">
-              {Object.entries({
-                [TwoCentsFilter.NEW_TODAY]: "New Today",
-                [TwoCentsFilter.TOP_TODAY]: "Top Today",
-                [TwoCentsFilter.TOP_ALL_TIME]: "Top All Time",
-                [TwoCentsFilter.CONTROVERSIAL]: "Controversial"
-              }).find(([key]) => key === selectedFilter)?.[1] || "Select Filter"}
-            </span>
-            <span className={`transition-transform duration-300 ${showMobileFilters ? 'rotate-180' : ''}`}>
-              ▼
-            </span>
-          </button>
-          
-          {/* Mobile Filter Dropdown */}
-          {showMobileFilters && (
-            <div className="absolute z-10 mt-2 w-full max-w-xs bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl shadow-xl">
-              {Object.entries({
-                [TwoCentsFilter.NEW_TODAY]: "New Today",
-                [TwoCentsFilter.TOP_TODAY]: "Top Today",
-                [TwoCentsFilter.TOP_ALL_TIME]: "Top All Time",
-                [TwoCentsFilter.CONTROVERSIAL]: "Controversial"
-              }).map(([filterValue, displayName]) => (
-                <button
-                  key={filterValue}
-                  onClick={() => {
-                    handleFilterChange(filterValue as TwoCentsFilter);
-                    setShowMobileFilters(false);
-                  }}
-                  className={`w-full px-4 py-3 text-left text-sm font-medium transition-all duration-300 first:rounded-t-xl last:rounded-b-xl ${
-                    selectedFilter === filterValue
-                      ? 'bg-gradient-to-r from-orange-500 to-yellow-500 text-black'
-                      : 'text-white/80 hover:text-white hover:bg-white/10'
-                  }`}
-                >
-                  {displayName}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
 
-        {/* Desktop Filter Buttons */}
-        <div className="hidden sm:flex bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-2 gap-2">
-          {Object.entries({
-            [TwoCentsFilter.NEW_TODAY]: "New Today",
-            [TwoCentsFilter.TOP_TODAY]: "Top Today",
-            [TwoCentsFilter.TOP_ALL_TIME]: "Top All Time",
-            [TwoCentsFilter.CONTROVERSIAL]: "Controversial"
-          }).map(([filterValue, displayName]) => (
-            <button
-              key={filterValue}
-              onClick={() => handleFilterChange(filterValue as TwoCentsFilter)}
-              className={`px-6 py-3 rounded-lg text-sm font-medium transition-all duration-300 ${
-                selectedFilter === filterValue
-                  ? 'bg-gradient-to-r from-orange-500 to-yellow-500 text-black shadow-lg'
-                  : 'text-white/60 hover:text-white hover:bg-white/10'
-              }`}
-            >
-              {displayName}
-            </button>
-          ))}
-        </div>
-      </div>
 
       {error && (
         <div className="bg-red-500/20 border border-red-500/50 text-red-300 px-6 py-4 rounded-xl mb-8">
           <p className="font-semibold">Error loading posts:</p>
           <p>{error}</p>
           <button 
-            onClick={() => fetchPostsData(selectedFilter)}
+            onClick={() => fetchPostsData()}
             className="mt-3 px-4 py-2 bg-red-500/20 border border-red-500/50 text-red-300 rounded-lg hover:bg-red-500/30 transition-colors"
           >
             Try Again
@@ -203,60 +122,71 @@ const Feed: React.FC = () => {
       </div>
 
       {/* Posts Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-8 max-w-7xl mx-auto items-start">
         {currentPosts.map((post, index) => {
           const voteStatus = getVoteStatus(post.uuid);
           return (
             <div
               key={post.uuid}
               onClick={() => handlePostClick(post.uuid)}
-              className={`group bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-6 cursor-pointer hover:bg-white/10 transition-all duration-300 hover:border-white/20 hover:shadow-xl hover:scale-105 ${
-                voteStatus.isViewed ? 'border-orange-500/30 bg-orange-500/5' : ''
+              className={`group bg-[#191f2a] border border-white/10 rounded-xl p-4 cursor-pointer hover:bg-[#1f2633] transition-all duration-300 h-80 flex flex-col ${
+                voteStatus.isViewed ? 'border-orange-500/30 bg-[#1f2633]' : ''
               }`}
             >
               {/* Post Header */}
-              <div className="flex items-center gap-3 mb-4">
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold text-black ${getNetWorthColor(post.author_meta?.balance || 0)}`}>
+              <div className="flex items-start gap-3 mb-3 flex-shrink-0">
+                <div className={`w-12 h-12 rounded-full flex items-center justify-center text-sm font-bold text-black ${getNetWorthColor(post.author_meta?.balance || 0)} flex-shrink-0`}>
                   {getInitials(post.author_meta?.username || 'Anonymous')}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h3 className="text-white font-medium truncate">{post.author_meta?.username || 'Anonymous'}</h3>
-                  <span className={`px-2 py-1 rounded-full text-xs font-bold ${getNetWorthColor(post.author_meta?.balance || 0)} text-black`}>
-                    {formatNetWorth(post.author_meta?.balance || 0)}
-                  </span>
+                  <div className="flex items-center gap-2 mb-1">
+                    <h3 className="text-white font-semibold text-base">{post.author_meta?.username || 'Anonymous'}</h3>
+                    <span className="text-white">✓</span>
+                    <span className="text-white/60 text-sm">@{post.author_meta?.username?.toLowerCase().replace(/\s+/g, '') || 'anonymous'}</span>
+                    {voteStatus.isViewed && (
+                      <span className="px-2 py-1 rounded-full text-xs font-bold bg-orange-500/20 text-orange-300 border border-orange-500/30">
+                        Viewed
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2 text-white/60 text-sm">
+                    <span>8:16 AM · Dec 7, 2024</span>
+                    <span className="w-4 h-4 rounded-full bg-white/20 flex items-center justify-center text-xs">i</span>
+                  </div>
                 </div>
-                {voteStatus.isViewed && (
-                  <span className="px-2 py-1 rounded-full text-xs font-bold bg-orange-500/20 text-orange-300 border border-orange-500/30">
-                    Viewed
-                  </span>
-                )}
+
               </div>
               
               {/* Post Content */}
-              <div className="mb-4">
-                <h4 className="text-white font-semibold text-lg mb-2 line-clamp-2">{post.title || 'No title'}</h4>
-                <p className="text-white/70 text-sm leading-relaxed line-clamp-3">
-                  {post.text || 'No content available'}
+              <div className="mb-4 pl-15 flex-1 overflow-hidden">
+                <p className="text-white text-lg leading-relaxed line-clamp-6">
+                  {truncateText(post.text || post.title || 'No content available')}
                 </p>
               </div>
 
-              {/* Post Stats */}
-              <div className="flex items-center justify-between text-white/60 text-sm">
-                <div className="flex items-center gap-4">
-                  <div className={`flex items-center gap-1 ${voteStatus.isUpvoted ? 'text-green-400' : ''}`}>
-                    <span className="text-lg">↗</span>
-                    <span>{(post.upvote_count || 0).toLocaleString()}</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <span>💬</span>
-                    <span>{(post.comment_count || 0).toLocaleString()}</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <span>👁️</span>
-                    <span>{(post.view_count || 0).toLocaleString()}</span>
-                  </div>
+              {/* Interaction Buttons */}
+              <div className="flex items-center gap-8 pl-15 flex-shrink-0">
+                <div className="flex items-center gap-2 text-white/60 hover:text-pink-400 transition-colors">
+                  <span className="text-xl">❤️</span>
+                  <span className="text-sm">{(post.upvote_count || 0).toLocaleString()}</span>
                 </div>
-                <span className="text-white/40 group-hover:text-white/60 transition-colors">→</span>
+                <div className="flex items-center gap-2 text-white/60 hover:text-blue-400 transition-colors">
+                  <span className="text-xl">💬</span>
+                  <span className="text-sm">{(post.comment_count || 0).toLocaleString()} Comments</span>
+                </div>
+                <div className="flex items-center gap-2 text-white/60 hover:text-green-400 transition-colors">
+                  <span className="text-xl">🔗</span>
+                  <span className="text-sm">Copy link</span>
+                </div>
+              </div>
+
+
+
+              {/* Read more button */}
+              <div className="mt-4 pl-15 flex-shrink-0">
+                <button className="w-full bg-[#1f2633] border border-white/20 rounded-lg py-3 text-white font-medium hover:bg-[#2a3441] transition-colors">
+                  Read more on TwoCents
+                </button>
               </div>
             </div>
           );
