@@ -235,7 +235,7 @@ const PostDetail: React.FC = () => {
   console.log('Comments state:', comments);
   
   return (
-    <div className="h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col">
       {/* Header */}
       <div className="p-4">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
@@ -253,7 +253,7 @@ const PostDetail: React.FC = () => {
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1">
         <div className="max-w-6xl mx-auto px-6 py-8">
           {/* Main Post */}
           <div className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-md border border-white/20 rounded-2xl p-8 mb-8 shadow-2xl">

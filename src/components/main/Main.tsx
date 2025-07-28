@@ -1,9 +1,21 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, easeOut } from "framer-motion";
+import heroImage from "../assets/hero.png";
 
 export default function Main() {
   const [email, setEmail] = useState("");
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [activeButton, setActiveButton] = useState<"ios" | "android" | null>("ios");
+  const [scrollY, setScrollY] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrollY(window.scrollY);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const handleEmailSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -11,6 +23,10 @@ export default function Main() {
       setIsSubmitted(true);
       setTimeout(() => setIsSubmitted(false), 3000);
     }
+  };
+
+  const handleButtonClick = (platform: "ios" | "android") => {
+    setActiveButton(platform);
   };
 
   // Animation variants for word-by-word animation
@@ -52,8 +68,9 @@ export default function Main() {
   ];
 
   return (
+    <>
     <div className="relative z-10 container max-w-6xl px-6 lg:px-0 mx-auto mt-10 lg:mt-20">
-      <div className="grid lg:grid-cols-2 gap-12 lg:gap-0 items-center ">
+      <div className="grid lg:grid-cols-2 gap-12 lg:gap-0">
         
         {/* Left Content */}
         <div className="space-y-6 lg:space-y-8">
@@ -78,34 +95,56 @@ export default function Main() {
 
           {/* Sign up buttons */}
           <div className="flex">
-            <button className="flex-1 h-auto text-white inline-flex items-center justify-center bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-600 hover:to-yellow-600 font-semibold lg:px-8 py-3 rounded-l-full text-[12px] lg:text-lg transition-all duration-300 transform hover:scale-105">
-              <span className="ml-2">Sign up for iOS</span>
+            <button 
+              className={`flex-1 h-auto text-white inline-flex items-center justify-center font-semibold lg:px-8 py-3 rounded-l-full text-[12px] lg:text-lg transition-all duration-300 transform hover:scale-105 ${
+                activeButton === "ios" 
+                  ? "bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-600 hover:to-yellow-600" 
+                  : "border border-white/30 hover:bg-white/10"
+              }`}
+              onClick={() => handleButtonClick("ios")}
+            >
+              <svg className="w-4 h-4 lg:w-5 lg:h-5 mr-2" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+              </svg>
+              <span>Sign up for iOS</span>
             </button>
-            <button className="flex-1 h-auto inline-flex items-center justify-center border border-white/30 text-white hover:bg-white/10 font-semibold lg:px-8 py-3 rounded-r-full text-[12px] lg:text-lg transition-all duration-300">
-              <span className="ml-2">Sign up for Android</span>
+            <button 
+              className={`flex-1 h-auto inline-flex items-center justify-center font-semibold lg:px-8 py-3 rounded-r-full text-[12px] lg:text-lg transition-all duration-300 ${
+                activeButton === "android" 
+                  ? "bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-600 hover:to-yellow-600 text-white transform hover:scale-105" 
+                  : "border border-white/30 text-white hover:bg-white/10"
+              }`}
+              onClick={() => handleButtonClick("android")}
+            >
+              <svg className="w-4 h-4 lg:w-5 lg:h-5 mr-2" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M17.523 15.3414c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.5511 0 .9993.4482.9993.9993.0001.5511-.4482.9997-.9993.9997m-11.046 0c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.5511 0 .9993.4482.9993.9993 0 .5511-.4482.9997-.9993.9997m11.4045-6.02l1.9973-3.4592a.416.416 0 00-.1521-.5676.416.416 0 00-.5676.1521l-2.0223 3.5036C15.5902 8.2432 13.8533 7.5 12 7.5s-3.5902.7432-5.1377 1.92L4.8401 5.9164a.416.416 0 00-.5676-.1521.416.416 0 00-.1521.5676L5.1178 9.3214C2.6889 11.1868 1.5 13.9121 1.5 17v.5c0 .8284.6716 1.5 1.5 1.5h19c.8284 0 1.5-.6716 1.5-1.5V17c0-3.0879-1.1889-5.8132-3.6178-7.6786"/>
+              </svg>
+              <span>Sign up for Android</span>
             </button>
           </div>
 
           {/* Email signup */}
-          <form onSubmit={handleEmailSubmit} className="flex">
+          <form onSubmit={handleEmailSubmit} className="relative">
             <input
               type="email"
               placeholder="Enter your email address"
               value={email}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
-              className="flex-1 bg-white/10 border-white/20 text-white placeholder:text-white/50 rounded-l-full py-3 px-8 text-[12px] lg:text-lg focus:ring-2 focus:ring-orange-400 focus:border-orange-400"
+              className="w-full bg-transparent border border-white/30 text-white placeholder:text-white/50 rounded-full py-3 px-8 pr-16 text-[12px] lg:text-lg focus:ring-2 focus:ring-orange-400 focus:border-orange-400 focus:outline-none transition-all duration-300"
             />
-            <button 
-              type="submit" 
-              className="h-auto inline-flex items-center justify-center bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-600 hover:to-yellow-600 rounded-r-full py-4 px-6 transition-all duration-300 transform hover:scale-105"
-              disabled={isSubmitted}
-            >
-              {isSubmitted ? (
-                <div className="w-4 h-4 lg:w-5 lg:h-5 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
-              ) : (
-                <span>→</span>
-              )}
-            </button>
+           <button 
+  type="submit" 
+  className="absolute right-2 top-1/2 -translate-y-1/2 h-12 w-12 flex items-center justify-center bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-600 hover:to-yellow-600 rounded-full transition-all duration-300 hover:scale-105 text-white font-semibold"
+  disabled={isSubmitted}
+>
+  {isSubmitted ? (
+    <div className="w-4 h-4 lg:w-5 lg:h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+  ) : (
+                    <span className="text-xl leading-none">→</span>
+  )}
+</button>
+
+
           </form>
 
           {isSubmitted && (
@@ -113,164 +152,23 @@ export default function Main() {
           )}
         </div>
 
-        {/* Right Content - Mobile Mockup */}
+        {/* Right Content - Hero Image */}
         <div className="relative flex justify-center lg:justify-end">
-          <div className="relative transform rotate-3 hover:rotate-0 transition-transform duration-700">
-            {/* Phone Frame */}
-            <div className="w-80 h-[650px] bg-white/40 rounded-[3rem] p-1.5 shadow-2xl">
-              <div className="w-full h-full bg-black rounded-[2.5rem] overflow-hidden relative">
-                
-                {/* Status Bar */}
-                <div className="flex justify-between items-center px-6 py-3 text-white text-sm">
-                  <span className="font-medium">9:41</span>
-                  <div className="flex items-center gap-1">
-                    <div className="flex gap-1">
-                      <div className="w-1 h-1 bg-white rounded-full"></div>
-                      <div className="w-1 h-1 bg-white rounded-full"></div>
-                      <div className="w-1 h-1 bg-white rounded-full"></div>
-                      <div className="w-1 h-1 bg-white/50 rounded-full"></div>
-                    </div>
-                    <div className="w-6 h-3 border border-white rounded-sm">
-                      <div className="w-4 h-1.5 bg-white rounded-sm m-0.5"></div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* App Header */}
-                <div className="flex items-center justify-between px-6 py-3 border-b border-gray-800">
-                  <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 bg-gradient-to-r from-orange-400 to-yellow-500 rounded-full flex items-center justify-center text-xs font-bold text-black">
-                      2¢
-                    </div>
-                    <span className="text-white font-medium">twocents</span>
-                  </div>
-                  <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center">
-                    <span className="text-black text-xs font-bold">?</span>
-                  </div>
-                </div>
-
-                {/* Posts */}
-                <div className="space-y-1">
-                  {/* Post 1 */}
-                  <div className="px-6 py-4 border-b border-gray-800">
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="w-8 h-8 bg-gradient-to-r from-orange-400 to-yellow-500 rounded-full flex items-center justify-center text-xs font-bold text-black">
-                        M
-                      </div>
-                      <div>
-                        <p className="text-white font-medium text-sm">Mortgage-Free Life</p>
-                        <div className="flex items-center gap-2">
-                          <span className="bg-yellow-500 text-black px-2 py-0.5 rounded-full text-xs font-bold">$58,430</span>
-                        </div>
-                      </div>
-                    </div>
-                    <p className="text-white/80 text-sm mb-3">I can't believe some of you are still paying rent. Mortgage-free since 2019 💰</p>
-                    <div className="flex items-center justify-between text-white/60 text-sm">
-                      <div className="flex items-center gap-4">
-                        <div className="flex items-center gap-1">
-                          <span>↗</span>
-                          <span>4,200</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <span>💬</span>
-                          <span>610</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <span>👁️</span>
-                          <span>8,500</span>
-                        </div>
-                      </div>
-                      <span>⋯</span>
-                    </div>
-                  </div>
-
-                  {/* Post 2 */}
-                  <div className="px-6 py-4 border-b border-gray-800">
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="w-8 h-8 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center text-xs font-bold text-black">
-                        H
-                      </div>
-                      <div>
-                        <p className="text-white font-medium text-sm">Happiness &gt; Money</p>
-                        <div className="flex items-center gap-2">
-                          <span className="bg-yellow-500 text-black px-2 py-0.5 rounded-full text-xs font-bold">$2,994</span>
-                        </div>
-                      </div>
-                    </div>
-                    <p className="text-white/80 text-sm mb-3">If you think being broke means being unhappy, you're not doing life right. Experiences &gt; money any day ✨</p>
-                    <div className="flex items-center justify-between text-white/60 text-sm">
-                      <div className="flex items-center gap-4">
-                        <div className="flex items-center gap-1">
-                          <span>↗</span>
-                          <span>15</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <span>💬</span>
-                          <span>56</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <span>👁️</span>
-                          <span>300</span>
-                        </div>
-                      </div>
-                      <span>⋯</span>
-                    </div>
-                  </div>
-
-                  {/* Post 3 */}
-                  <div className="px-6 py-4 border-b border-gray-800">
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="w-8 h-8 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-xs font-bold text-white">
-                        S
-                      </div>
-                      <div>
-                        <p className="text-white font-medium text-sm">Sold My Startup</p>
-                        <div className="flex items-center gap-2">
-                          <span className="bg-blue-500 text-white px-2 py-0.5 rounded-full text-xs font-bold">$5</span>
-                        </div>
-                      </div>
-                    </div>
-                    <p className="text-white/80 text-sm mb-3">I'm 25, no degree, and I just sold my first startup for $1M 🤯 What are you waiting for?</p>
-                    <div className="flex items-center justify-between text-white/60 text-sm">
-                      <div className="flex items-center gap-4">
-                        <div className="flex items-center gap-1">
-                          <span>↗</span>
-                          <span>126</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <span>💬</span>
-                          <span>240</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <span>👁️</span>
-                          <span>2,006</span>
-                        </div>
-                      </div>
-                      <span>⋯</span>
-                    </div>
-                  </div>
-
-                  {/* Post 4 */}
-                  <div className="px-6 py-4">
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="w-8 h-8 bg-gradient-to-r from-green-400 to-blue-500 rounded-full flex items-center justify-center text-xs font-bold text-white">
-                        W
-                      </div>
-                      <div>
-                        <p className="text-white font-medium text-sm">World Traveler</p>
-                        <div className="flex items-center gap-2">
-                          <span className="bg-green-500 text-white px-2 py-0.5 rounded-full text-xs font-bold">$3,322</span>
-                        </div>
-                      </div>
-                    </div>
-                    <p className="text-white/80 text-sm mb-3">Quit my 9-to-5 to travel the world. Got $30k left.</p>
-                  </div>
-                </div>
-              </div>
-            </div>
+          <div className="relative">
+            <img 
+              src={heroImage} 
+              alt="TwoCents App" 
+              className="rounded-[3rem]"
+              style={{
+                transform: window.innerWidth >= 1024 ? `translateY(${-scrollY * 0.3}px)` : 'none',
+                transition: 'transform 0.1s ease-out'
+              }}
+            />
           </div>
         </div>
       </div>
     </div>
+    <div className="h-[4px] w-full bg-gradient-to-r from-transparent via-yellow-500 to-transparent rounded-full hidden lg:block"></div>
+    </>
   );
 }

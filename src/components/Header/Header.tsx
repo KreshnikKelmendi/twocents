@@ -41,7 +41,7 @@ const Header = () => {
                 onClick={handleLogoClick}
               >
                 <img src={logo} alt="TwoCents Logo" className="h-12 w-12" />
-                <h1 className="text-2xl font-bold font-inter">TwoCents</h1>
+                <h1 className="text-2xl font-bold font-inter">twocents</h1>
               </div>
 
               {/* Desktop Menu */}

@@ -26,7 +26,8 @@ const FeaturesSection = () => {
   ];
 
   return (
-    <div className="relative z-10 container max-w-6xl mx-auto px-6 lg:px-0 py-24 lg:py-36">
+    <>
+    <div className="relative z-10 container max-w-6xl mx-auto px-6 lg:px-0 py-24 ">
       {/* Feature Highlights */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-12 mb-20">
         {features.map((feature, index) => {
@@ -54,6 +55,9 @@ const FeaturesSection = () => {
         </h2>
       </div>
     </div>
+    <div className="h-[4px] w-full bg-gradient-to-r from-transparent via-yellow-500 to-transparent rounded-full hidden lg:block"></div>
+
+    </>
   );
 };
 

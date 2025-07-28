@@ -95,7 +95,7 @@ const Feed: React.FC = () => {
   }
 
   return (
-    <div className="container max-w-6xl mx-auto px-6 lg:px-0">
+    <div className="container max-w-6xl mx-auto px-6 lg:px-0 lg:mt-6">
       {/* Header */}
      
 
@@ -183,9 +183,9 @@ const Feed: React.FC = () => {
 
 
               {/* Read more button */}
-              <div className="mt-4 pl-15 flex-shrink-0">
+              <div className="mt-4 flex-shrink-0">
                 <button className="w-full bg-[#1f2633] border border-white/20 rounded-lg py-3 text-white font-medium hover:bg-[#2a3441] transition-colors">
-                  Read more on TwoCents
+                  Read more
                 </button>
               </div>
             </div>

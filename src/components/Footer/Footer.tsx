@@ -15,7 +15,7 @@ const Footer: React.FC = () => {
             <div className="flex items-center justify-center lg:justify-start mb-4">
               <img src={logo} alt="TwoCents Logo" className="h-10 w-auto mr-3" />
               <h3 className="text-2xl font-bold font-inter bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
-                TwoCents
+                twocents
               </h3>
             </div>
             <p className="text-gray-400 text-sm font-inter font-light leading-relaxed">
