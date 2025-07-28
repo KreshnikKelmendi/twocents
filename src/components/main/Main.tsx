@@ -132,17 +132,17 @@ export default function Main() {
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
               className="w-full bg-transparent border border-white/30 text-white placeholder:text-white/50 rounded-full py-3 px-8 pr-16 text-[12px] lg:text-lg focus:ring-2 focus:ring-orange-400 focus:border-orange-400 focus:outline-none transition-all duration-300"
             />
-           <button 
-  type="submit" 
-  className="absolute right-2 top-1/2 -translate-y-1/2 h-12 w-12 flex items-center justify-center bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-600 hover:to-yellow-600 rounded-full transition-all duration-300 hover:scale-105 text-white font-semibold"
-  disabled={isSubmitted}
->
-  {isSubmitted ? (
-    <div className="w-4 h-4 lg:w-5 lg:h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-  ) : (
-                    <span className="text-xl leading-none">→</span>
-  )}
-</button>
+                       <button 
+              type="submit" 
+              className="absolute right-1 top-1/2 -translate-y-1/2 h-10 w-10 lg:h-12 lg:w-12 flex items-center justify-center bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-600 hover:to-yellow-600 rounded-full transition-all duration-300 hover:scale-105 text-white font-semibold"
+              disabled={isSubmitted}
+            >
+              {isSubmitted ? (
+                <div className="w-3 h-3 lg:w-5 lg:h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              ) : (
+                <span>&gt;</span>
+              )}
+            </button>
 
 
           </form>
