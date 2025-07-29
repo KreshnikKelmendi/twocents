@@ -280,7 +280,7 @@ const PostDetail: React.FC = () => {
       <div className="bg-gradient-to-br from-white/8 to-white/3 backdrop-blur-sm border border-white/20 rounded-xl p-6 mb-6 shadow-lg">
         <h4 className="text-white font-bold text-lg mb-4">📊 {localPoll.question}</h4>
         <div className="space-y-3">
-          {localPoll.options.map((option) => (
+          {localPoll.options.map((option, index) => (
             <div key={option.uuid} className="relative">
               <button
                 onClick={() => handleVote(option.uuid)}
@@ -301,12 +301,12 @@ const PostDetail: React.FC = () => {
                 </div>
                 <div className="w-full bg-white/10 rounded-full h-3 overflow-hidden">
                   <div 
-                    className={`bg-gradient-to-r from-orange-400 to-yellow-400 h-3 rounded-full transition-all duration-1000 ease-out ${
+                    className={`bg-gradient-to-r from-orange-400 to-yellow-400 h-3 rounded-full transition-all duration-1500 ease-out ${
                       showAnimation ? 'animate-pulse' : ''
                     }`}
                     style={{ 
                       width: showAnimation ? `${option.percentage}%` : '0%',
-                      transitionDelay: `${Math.random() * 500}ms`
+                      transitionDelay: `${index * 200}ms`
                     }}
                   ></div>
                 </div>

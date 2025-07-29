@@ -29,7 +29,7 @@ export default function Main() {
     setActiveButton(platform);
   };
 
-  // Animation variants for word-by-word animation
+  // Animation variants 
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -58,7 +58,6 @@ export default function Main() {
     },
   };
 
-  // Split the text into words while preserving line breaks
   const headingWords = [
     { text: "YOUR", className: "text-white/10 lg:block" },
     { text: "USERNAME", className: "bg-gradient-to-r from-[#744608] to-[#7c5f0c] bg-clip-text text-transparent lg:block" },
@@ -72,7 +71,7 @@ export default function Main() {
     <div className="relative z-10 container max-w-6xl px-6 lg:px-0 mx-auto mt-10 lg:mt-20">
       <div className="grid lg:grid-cols-2 gap-12 lg:gap-0">
         
-        {/* Left Content */}
+        {/* Left Side */}
         <div className="space-y-6 lg:space-y-8">
           <div className="space-y-4">
             <motion.h1 
