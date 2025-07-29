@@ -13,6 +13,17 @@ const Feed: React.FC = () => {
   const navigate = useNavigate();
   const { isUpvoted, isDownvoted, isViewed } = useVoteState();
 
+  // iOS-compatible scroll to top function
+  const scrollToTop = () => {
+    // For iOS Safari compatibility
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+    // Fallback for other browsers
+    if (window.scrollTo) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
   // Animated Counter Component
   const AnimatedCounter: React.FC<{ value: number }> = ({ value }) => {
     const [count, setCount] = useState(0);
@@ -99,20 +110,21 @@ const Feed: React.FC = () => {
     setCurrentFilter(filter);
     setShowMobileFilters(false); // Close mobile dropdown when filter is selected
     await fetchPostsData(filter);
+    // No scroll to top - stay in current position
   };
 
   const getFilterDisplayName = (filter: TwoCentsFilter) => {
     switch (filter) {
       case TwoCentsFilter.TOP_ALL_TIME:
-        return '🏆 Top All Time';
+        return 'Top All Time';
       case TwoCentsFilter.TOP_TODAY:
-        return '📈 Top Today';
+        return 'Top Today';
       case TwoCentsFilter.NEW_TODAY:
-        return '🆕 New Today';
+        return 'New Today';
       case TwoCentsFilter.CONTROVERSIAL:
-        return '🔥 Controversial';
+        return 'Controversial';
       default:
-        return '🏆 Top All Time';
+        return 'Top All Time';
     }
   };
 
@@ -149,8 +161,8 @@ const Feed: React.FC = () => {
 
   const handlePostClick = (postId: string) => {
     navigate(`/post/${postId}`);
-    // Scroll to top when navigating to post detail
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // Scroll to top when navigating to post detail - iOS compatible
+    scrollToTop();
   };
 
 
@@ -201,11 +213,8 @@ const Feed: React.FC = () => {
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
-    // Scroll to the TwoCents Feed header
-    const headerElement = document.querySelector('h2');
-    if (headerElement) {
-      headerElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+    // Scroll to top when changing pages - iOS compatible
+    scrollToTop();
   };
 
   if (loading) {
@@ -230,7 +239,11 @@ const Feed: React.FC = () => {
           <p className="font-semibold">Error loading posts:</p>
           <p>{error}</p>
           <button 
-            onClick={() => fetchPostsData()}
+            onClick={() => {
+              fetchPostsData();
+              // Scroll to top when retrying - iOS compatible
+              scrollToTop();
+            }}
             className="mt-3 px-4 py-2 bg-red-500/20 border border-red-500/50 text-red-300 rounded-lg hover:bg-red-500/30 transition-colors"
           >
             Try Again
@@ -263,7 +276,7 @@ const Feed: React.FC = () => {
                       currentFilter === TwoCentsFilter.TOP_ALL_TIME ? 'bg-orange-500/20 text-orange-300' : 'text-white'
                     }`}
                   >
-                    🏆 Top All Time
+                    Top All Time
                   </button>
                   <button
                     onClick={() => handleFilterChange(TwoCentsFilter.TOP_TODAY)}
@@ -271,7 +284,7 @@ const Feed: React.FC = () => {
                       currentFilter === TwoCentsFilter.TOP_TODAY ? 'bg-orange-500/20 text-orange-300' : 'text-white'
                     }`}
                   >
-                    📈 Top Today
+                    Top Today
                   </button>
                   <button
                     onClick={() => handleFilterChange(TwoCentsFilter.NEW_TODAY)}
@@ -279,7 +292,7 @@ const Feed: React.FC = () => {
                       currentFilter === TwoCentsFilter.NEW_TODAY ? 'bg-orange-500/20 text-orange-300' : 'text-white'
                     }`}
                   >
-                    🆕 New Today
+                    New Today
                   </button>
                   <button
                     onClick={() => handleFilterChange(TwoCentsFilter.CONTROVERSIAL)}
@@ -287,7 +300,7 @@ const Feed: React.FC = () => {
                       currentFilter === TwoCentsFilter.CONTROVERSIAL ? 'bg-orange-500/20 text-orange-300' : 'text-white'
                     }`}
                   >
-                    🔥 Controversial
+                    Controversial
                   </button>
                 </div>
               </div>
@@ -305,7 +318,7 @@ const Feed: React.FC = () => {
                 : 'bg-white/10 text-white/70 hover:bg-white/20 hover:text-white'
             }`}
           >
-            🏆 Top All Time
+            Top All Time
           </button>
           <button
             onClick={() => handleFilterChange(TwoCentsFilter.TOP_TODAY)}
@@ -315,7 +328,7 @@ const Feed: React.FC = () => {
                 : 'bg-white/10 text-white/70 hover:bg-white/20 hover:text-white'
             }`}
           >
-            📈 Top Today
+            Top Today
           </button>
           <button
             onClick={() => handleFilterChange(TwoCentsFilter.NEW_TODAY)}
@@ -325,7 +338,7 @@ const Feed: React.FC = () => {
                 : 'bg-white/10 text-white/70 hover:bg-white/20 hover:text-white'
             }`}
           >
-            🆕 New Today
+            New Today
           </button>
           <button
             onClick={() => handleFilterChange(TwoCentsFilter.CONTROVERSIAL)}
@@ -335,7 +348,7 @@ const Feed: React.FC = () => {
                 : 'bg-white/10 text-white/70 hover:bg-white/20 hover:text-white'
             }`}
           >
-            🔥 Controversial
+            Controversial
           </button>
         </div>
       </div>
@@ -374,6 +387,8 @@ const Feed: React.FC = () => {
                         onClick={(e) => {
                           e.stopPropagation();
                           navigate(`/user/${post.author_uuid}`);
+                          // Scroll to top when navigating to user profile - iOS compatible
+                          scrollToTop();
                         }}
                         className={`px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full text-xs font-bold shadow-md ${getNetWorthColor(post.author_meta?.balance || 0)} text-black hover:scale-105 transition-transform duration-200 cursor-pointer`}
                       >

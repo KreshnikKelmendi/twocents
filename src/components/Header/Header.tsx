@@ -175,25 +175,25 @@ const Header = () => {
                 onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
                 className="text-white hover:text-amber-200 transition-colors duration-300 font-inter bg-transparent border-none cursor-pointer"
               >
-                Lorem Ipsum
+                Home
               </button>
               <button 
                 onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
                 className="text-white hover:text-amber-200 transition-colors duration-300 font-inter bg-transparent border-none cursor-pointer"
               >
-                Lorem Ipsum
+                About Us
               </button>
               <button 
                 onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
                 className="text-white hover:text-amber-200 transition-colors duration-300 font-inter bg-transparent border-none cursor-pointer"
               >
-                Amet Consectetur
+                Blog
               </button>
               <button 
                 onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
                 className="text-white hover:text-amber-200 transition-colors duration-300 font-inter bg-transparent border-none cursor-pointer"
               >
-                Elit Sed
+                Profile
               </button>
             </nav>
           </div>

@@ -12,6 +12,17 @@ const PostDetail: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const { markAsViewed } = useVoteState();
 
+  // iOS-compatible scroll to top function
+  const scrollToTop = () => {
+    // For iOS Safari compatibility
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+    // Fallback for other browsers
+    if (window.scrollTo) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
   // Animated Counter Component
   const AnimatedCounter: React.FC<{ value: number }> = ({ value }) => {
     const [count, setCount] = useState(0);
@@ -179,7 +190,11 @@ const PostDetail: React.FC = () => {
             </h4>
             {author?.author_uuid && (
               <button
-                onClick={() => navigate(`/user/${author.author_uuid}`)}
+                onClick={() => {
+                  navigate(`/user/${author.author_uuid}`);
+                  // Scroll to top when navigating to user profile - iOS compatible
+                  scrollToTop();
+                }}
                 className={`px-3 py-1 rounded-full text-xs font-bold shadow-md ${getNetWorthColor(author?.balance || 0)} text-black hover:scale-105 transition-transform duration-200 cursor-pointer`}
               >
                 {formatNetWorth(author?.balance || 0)}
