@@ -5,6 +5,7 @@ import Main from './components/main/Main';
 import FeaturesSection from './components/FeaturesSection/FeaturesSection';
 import Feed from './components/Feed/Feed';
 import PostDetail from './components/PostDetail/PostDetail';
+import UserProfile from './components/UserProfile/UserProfile';
 import Footer from './components/Footer/Footer';
 
 function App() {
@@ -22,6 +23,7 @@ function App() {
               </>
             } />
             <Route path="/post/:postId" element={<PostDetail />} />
+            <Route path="/user/:userId" element={<UserProfile />} />
           </Routes>
         </main>
         <Footer />

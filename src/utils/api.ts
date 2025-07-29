@@ -59,7 +59,7 @@ export interface PollResponse {
 export interface Comment {
   uuid: string;
   author_uuid: string;
-  content: string;
+  text: string;
   upvote_count: number;
   created_at: string;
   author_meta: {
@@ -70,6 +70,19 @@ export interface Comment {
     arena?: string;
   };
   replies?: Comment[];
+}
+
+export interface User {
+  uuid: string;
+  username: string;
+  bio: string;
+  age: number;
+  gender: string;
+  balance: number;
+  arena: string;
+  subscription_type: number;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface PostsFeedResponse {
@@ -241,6 +254,18 @@ export class TwoCentsAPI {
     return this.call<{ comments: Comment[] }>('/v1/comments/get', { post_uuid: postUUID });
   }
 
+  async votePoll(pollUUID: string, optionUUID: string): Promise<void> {
+    return this.call<void>('/v1/polls/vote', { poll_uuid: pollUUID, option_uuid: optionUUID });
+  }
+
+  async getUser(userUUID: string): Promise<{ user: User }> {
+    return this.call<{ user: User }>('/v1/users/get', { user_uuid: userUUID });
+  }
+
+  async getUserPosts(userUUID: string): Promise<{ posts: Post[] }> {
+    return this.call<{ posts: Post[] }>('/v1/users/posts', { user_uuid: userUUID });
+  }
+
   // Generic JSON-RPC call method
   private async call<T>(method: string, parameters: Record<string, any> = {}): Promise<T> {
     const mutableParams = { ...parameters };
@@ -328,6 +353,35 @@ export const fetchComments = async (postUUID: string): Promise<Comment[]> => {
     return response.comments || [];
   } catch (error) {
     console.error('Failed to fetch comments:', error);
+    throw error;
+  }
+};
+
+export const votePoll = async (pollUUID: string, optionUUID: string): Promise<void> => {
+  try {
+    await api.votePoll(pollUUID, optionUUID);
+  } catch (error) {
+    console.error('Failed to vote on poll:', error);
+    throw error;
+  }
+};
+
+export const fetchUser = async (userUUID: string): Promise<User> => {
+  try {
+    const response = await api.getUser(userUUID);
+    return response.user;
+  } catch (error) {
+    console.error('Failed to fetch user:', error);
+    throw error;
+  }
+};
+
+export const fetchUserPosts = async (userUUID: string): Promise<Post[]> => {
+  try {
+    const response = await api.getUserPosts(userUUID);
+    return response.posts || [];
+  } catch (error) {
+    console.error('Failed to fetch user posts:', error);
     throw error;
   }
 };

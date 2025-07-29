@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { fetchPost, fetchPoll, fetchComments, Post, Comment, Poll, useVoteState } from '../../utils/api';
+import { fetchPost, fetchPoll, fetchComments, votePoll, Post, Comment, Poll, useVoteState } from '../../utils/api';
 
 const PostDetail: React.FC = () => {
   const { postId } = useParams<{ postId: string }>();
@@ -11,6 +11,54 @@ const PostDetail: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { markAsViewed } = useVoteState();
+
+  // Animated Counter Component
+  const AnimatedCounter: React.FC<{ value: number }> = ({ value }) => {
+    const [count, setCount] = useState(0);
+    const [isVisible, setIsVisible] = useState(false);
+
+    useEffect(() => {
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            setIsVisible(true);
+          }
+        },
+        { threshold: 0.1 }
+      );
+
+      const element = document.querySelector('.animated-counter');
+      if (element) {
+        observer.observe(element);
+      }
+
+      return () => observer.disconnect();
+    }, []);
+
+    useEffect(() => {
+      if (isVisible) {
+        const duration = 2000; // 2 seconds
+        const steps = 60; // 60 steps for smooth animation
+        const increment = value / steps;
+        const stepDuration = duration / steps;
+
+        let currentCount = 0;
+        const timer = setInterval(() => {
+          currentCount += increment;
+          if (currentCount >= value) {
+            setCount(value);
+            clearInterval(timer);
+          } else {
+            setCount(Math.floor(currentCount));
+          }
+        }, stepDuration);
+
+        return () => clearInterval(timer);
+      }
+    }, [value, isVisible]);
+
+    return <span className="animated-counter">{count.toLocaleString()}</span>;
+  };
 
   const loadPost = useCallback(async () => {
     if (!postId) return;
@@ -30,13 +78,23 @@ const PostDetail: React.FC = () => {
         setPost(postData.value);
         markAsViewed(postId);
       } else {
-        throw postData.reason;
+        // Handle specific error cases
+        const error = postData.reason;
+        if (error.message?.includes('404') || error.message?.includes('not found')) {
+          throw new Error('Post not found');
+        } else if (error.message?.includes('unsupported') || error.message?.includes('type')) {
+          throw new Error('This post type is not supported');
+        } else {
+          throw error;
+        }
       }
       
       if (pollData.status === 'fulfilled') {
         setPoll(pollData.value);
+      } else {
+        // Poll is optional, so we just log the warning
+        console.warn('Failed to fetch poll:', pollData.reason);
       }
-      // Poll is optional, so we don't throw if it fails
       
       if (commentsData.status === 'fulfilled') {
         console.log('Comments data:', commentsData.value);
@@ -119,9 +177,19 @@ const PostDetail: React.FC = () => {
             <h4 className={`text-white font-semibold ${classes.name}`}>
               {author?.username || 'Anonymous'}
             </h4>
-            <span className={`px-3 py-1 rounded-full text-xs font-bold shadow-md ${getNetWorthColor(author?.balance || 0)} text-black`}>
-              {formatNetWorth(author?.balance || 0)}
-            </span>
+            {author?.author_uuid && (
+              <button
+                onClick={() => navigate(`/user/${author.author_uuid}`)}
+                className={`px-3 py-1 rounded-full text-xs font-bold shadow-md ${getNetWorthColor(author?.balance || 0)} text-black hover:scale-105 transition-transform duration-200 cursor-pointer`}
+              >
+                {formatNetWorth(author?.balance || 0)}
+              </button>
+            )}
+            {!author?.author_uuid && (
+              <span className={`px-3 py-1 rounded-full text-xs font-bold shadow-md ${getNetWorthColor(author?.balance || 0)} text-black`}>
+                {formatNetWorth(author?.balance || 0)}
+              </span>
+            )}
           </div>
           <div className="flex items-center gap-3 text-white/60">
             {author?.age && (
@@ -145,50 +213,130 @@ const PostDetail: React.FC = () => {
     );
   };
 
-  const PollComponent: React.FC<{ poll: Poll }> = ({ poll }) => (
-    <div className="bg-gradient-to-br from-white/8 to-white/3 backdrop-blur-sm border border-white/20 rounded-xl p-6 mb-6 shadow-lg">
-      <h4 className="text-white font-bold text-lg mb-4">📊 {poll.question}</h4>
-      <div className="space-y-3">
-        {poll.options.map((option) => (
-          <div key={option.uuid} className="relative">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-white/90 text-sm">{option.text}</span>
-              <span className="text-white/70 text-sm">{option.vote_count} votes ({option.percentage.toFixed(1)}%)</span>
+  const PollComponent: React.FC<{ poll: Poll }> = ({ poll }) => {
+    const [localPoll, setLocalPoll] = useState<Poll>(poll);
+    const [voting, setVoting] = useState<string | null>(null);
+    const [showAnimation, setShowAnimation] = useState(false);
+
+    useEffect(() => {
+      setLocalPoll(poll);
+      // Trigger animation after a short delay
+      const timer = setTimeout(() => setShowAnimation(true), 100);
+      return () => clearTimeout(timer);
+    }, [poll]);
+
+    const handleVote = async (optionUUID: string) => {
+      if (voting || localPoll.user_vote) return; // Prevent double voting
+
+      try {
+        setVoting(optionUUID);
+        await votePoll(poll.uuid, optionUUID);
+        
+        // Update local state optimistically
+        const updatedOptions = localPoll.options.map(option => {
+          if (option.uuid === optionUUID) {
+            return { ...option, vote_count: option.vote_count + 1 };
+          }
+          return option;
+        });
+
+        // Recalculate percentages
+        const totalVotes = updatedOptions.reduce((sum, option) => sum + option.vote_count, 0);
+        const updatedOptionsWithPercentages = updatedOptions.map(option => ({
+          ...option,
+          percentage: totalVotes > 0 ? (option.vote_count / totalVotes) * 100 : 0
+        }));
+
+        setLocalPoll({
+          ...localPoll,
+          options: updatedOptionsWithPercentages,
+          user_vote: optionUUID,
+          total_votes: totalVotes
+        });
+      } catch (error) {
+        console.error('Failed to vote:', error);
+        // You could show a toast notification here
+      } finally {
+        setVoting(null);
+      }
+    };
+
+    return (
+      <div className="bg-gradient-to-br from-white/8 to-white/3 backdrop-blur-sm border border-white/20 rounded-xl p-6 mb-6 shadow-lg">
+        <h4 className="text-white font-bold text-lg mb-4">📊 {localPoll.question}</h4>
+        <div className="space-y-3">
+          {localPoll.options.map((option) => (
+            <div key={option.uuid} className="relative">
+              <button
+                onClick={() => handleVote(option.uuid)}
+                disabled={voting !== null || !!localPoll.user_vote}
+                className={`w-full text-left p-3 rounded-lg transition-all duration-200 ${
+                  localPoll.user_vote === option.uuid
+                    ? 'bg-green-500/20 border border-green-500/50'
+                    : voting === option.uuid
+                    ? 'bg-orange-500/20 border border-orange-500/50'
+                    : 'hover:bg-white/10 border border-transparent'
+                } ${voting !== null || !!localPoll.user_vote ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'}`}
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-white/90 text-sm font-medium">{option.text}</span>
+                  <span className="text-white/70 text-sm">
+                    {option.vote_count} votes ({option.percentage.toFixed(1)}%)
+                  </span>
+                </div>
+                <div className="w-full bg-white/10 rounded-full h-3 overflow-hidden">
+                  <div 
+                    className={`bg-gradient-to-r from-orange-400 to-yellow-400 h-3 rounded-full transition-all duration-1000 ease-out ${
+                      showAnimation ? 'animate-pulse' : ''
+                    }`}
+                    style={{ 
+                      width: showAnimation ? `${option.percentage}%` : '0%',
+                      transitionDelay: `${Math.random() * 500}ms`
+                    }}
+                  ></div>
+                </div>
+                {localPoll.user_vote === option.uuid && (
+                  <div className="absolute -top-1 -right-1 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                    <span className="text-white text-xs">✓</span>
+                  </div>
+                )}
+                {voting === option.uuid && (
+                  <div className="absolute -top-1 -right-1 w-6 h-6 bg-orange-500 rounded-full flex items-center justify-center">
+                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                  </div>
+                )}
+              </button>
             </div>
-            <div className="w-full bg-white/10 rounded-full h-3">
-              <div 
-                className="bg-gradient-to-r from-orange-400 to-yellow-400 h-3 rounded-full transition-all duration-500"
-                style={{ width: `${option.percentage}%` }}
-              ></div>
-            </div>
-            {poll.user_vote === option.uuid && (
-              <div className="absolute -top-1 -right-1 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
-                <span className="text-white text-xs">✓</span>
-              </div>
-            )}
-          </div>
-        ))}
+          ))}
+        </div>
+        <div className="mt-4 text-center text-white/50 text-sm">
+          Total votes: {localPoll.total_votes}
+          {localPoll.user_vote && (
+            <span className="ml-2 text-green-400">✓ You voted</span>
+          )}
+        </div>
       </div>
-      <div className="mt-4 text-center text-white/50 text-sm">
-        Total votes: {poll.total_votes}
-      </div>
-    </div>
-  );
+    );
+  };
 
   const CommentComponent: React.FC<{ comment: Comment; level?: number }> = ({ comment, level = 0 }) => (
     <div className={`${level > 0 ? 'ml-8 border-l-2 border-gradient-to-b from-orange-500/30 to-yellow-500/30 pl-6' : ''}`}>
       <div className="bg-gradient-to-br from-white/8 to-white/3 backdrop-blur-sm border border-white/20 rounded-xl p-5 mb-4 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
         <AuthorInfo author={comment.author_meta} size="sm" />
         <div className="mt-4">
-          <p className="text-white/90 text-sm mb-4 leading-relaxed">{comment.content}</p>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4 text-white/60 text-sm">
-              <div className="flex items-center gap-2 bg-white/10 px-3 py-1 rounded-full">
-                <span className="text-orange-400">↗</span>
-                <span>{(comment.upvote_count || 0).toLocaleString()}</span>
+          <p className="text-white/90 text-sm mb-4 leading-relaxed">{comment.text}</p>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
+            <div className="flex items-center gap-2 sm:gap-4 text-white/60 text-xs sm:text-sm">
+              <div className="flex items-center gap-1 sm:gap-2 bg-white/10 px-2 py-1 rounded-lg">
+                <span className="text-orange-400 text-xs sm:text-sm">↑</span>
+                <span className="text-white font-medium text-xs sm:text-sm">
+                  <AnimatedCounter value={comment.upvote_count || 0} />
+                </span>
+                <span className="text-white/60 text-xs hidden sm:inline">upvotes</span>
+                <span className="text-white/60 text-xs sm:hidden">↑</span>
               </div>
             </div>
-            <span className="text-white/50 text-xs bg-white/10 px-2 py-1 rounded-full">
+            <span className="text-white/50 text-xs bg-white/10 px-2 py-1 rounded-full self-start sm:self-auto">
               {formatDate(comment.created_at)}
             </span>
           </div>
@@ -261,18 +409,30 @@ const PostDetail: React.FC = () => {
             <div className="mt-6">
               <h3 className="text-white font-bold text-3xl mb-4 leading-tight">{post.title || 'No title'}</h3>
               <p className="text-white/90 text-lg mb-6 leading-relaxed">{post.text || 'No content available'}</p>
-              <div className="flex items-center gap-6 text-white/70 text-base">
-                <div className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full">
-                  <span className="text-orange-400 text-xl">↗</span>
-                  <span>{(post.upvote_count || 0).toLocaleString()}</span>
+              <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-white/70 text-sm sm:text-base">
+                <div className="flex items-center gap-1 sm:gap-2 bg-white/10 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg">
+                  <span className="text-orange-400 text-sm sm:text-base">↑</span>
+                  <span className="text-white font-medium text-xs sm:text-sm">
+                    <AnimatedCounter value={post.upvote_count || 0} />
+                  </span>
+                  <span className="text-white/60 text-xs sm:text-sm hidden sm:inline">upvotes</span>
+                  <span className="text-white/60 text-xs sm:inline">↑</span>
                 </div>
-                <div className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full">
-                  <span className="text-blue-400 text-xl">💬</span>
-                  <span>{(post.comment_count || 0).toLocaleString()}</span>
+                <div className="flex items-center gap-1 sm:gap-2 bg-white/10 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg">
+                  <span className="text-blue-400 text-sm sm:text-base">💬</span>
+                  <span className="text-white font-medium text-xs sm:text-sm">
+                    <AnimatedCounter value={post.comment_count || 0} />
+                  </span>
+                  <span className="text-white/60 text-xs sm:text-sm hidden sm:inline">comments</span>
+                  <span className="text-white/60 text-xs sm:inline">💬</span>
                 </div>
-                <div className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full">
-                  <span className="text-green-400 text-xl">👁️</span>
-                  <span>{(post.view_count || 0).toLocaleString()}</span>
+                <div className="flex items-center gap-1 sm:gap-2 bg-white/10 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg">
+                  <span className="text-green-400 text-sm sm:text-base">👁️</span>
+                  <span className="text-white font-medium text-xs sm:text-sm">
+                    <AnimatedCounter value={post.view_count || 0} />
+                  </span>
+                  <span className="text-white/60 text-xs sm:text-sm hidden sm:inline">views</span>
+                  <span className="text-white/60 text-xs sm:inline">👁️</span>
                 </div>
               </div>
             </div>
