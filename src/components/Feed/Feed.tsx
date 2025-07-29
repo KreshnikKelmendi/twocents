@@ -425,7 +425,6 @@ const Feed: React.FC = () => {
                     <AnimatedCounter value={post.upvote_count || 0} />
                   </span>
                   <span className="text-xs text-white/40 hidden sm:inline">upvotes</span>
-                  <span className="text-xs text-white/40 sm:hidden">↑</span>
                 </div>
                 <div className="flex items-center gap-1 sm:gap-2 text-white/60 hover:text-blue-400 transition-colors">
                   <span className="text-sm sm:text-lg">💬</span>
@@ -433,7 +432,6 @@ const Feed: React.FC = () => {
                     <AnimatedCounter value={post.comment_count || 0} />
                   </span>
                   <span className="text-xs text-white/40 hidden sm:inline">comments</span>
-                  <span className="text-xs text-white/40 sm:hidden">💬</span>
                 </div>
                 <div className="flex items-center gap-1 sm:gap-2 text-white/60 hover:text-green-400 transition-colors">
                   <span className="text-sm sm:text-lg">👁️</span>
@@ -441,7 +439,6 @@ const Feed: React.FC = () => {
                     <AnimatedCounter value={post.view_count || 0} />
                   </span>
                   <span className="text-xs text-white/40 hidden sm:inline">views</span>
-                  <span className="text-xs text-white/40 sm:hidden">👁️</span>
                 </div>
               </div>
 
