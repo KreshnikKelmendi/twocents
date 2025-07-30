@@ -206,12 +206,7 @@ const Feed: React.FC = () => {
   }
 
   return (
-    <div className="container max-w-6xl mx-auto px-6 lg:px-0 lg:mt-6">
-      {/* Header */}
-     
-
-
-
+    <div className="container max-w-6xl mx-auto px-6 lg:px-0 lg:mt-20">
       {error && (
         <div className="bg-red-500/20 border border-red-500/50 text-red-300 px-6 py-4 rounded-xl mb-8">
           <p className="font-semibold">Error loading posts:</p>

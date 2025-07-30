@@ -7,7 +7,7 @@ const Footer: React.FC = () => {
       {/* Background gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none"></div>
       
-      <div className="max-w-6xl mx-auto px-6 lg:px-8 relative z-10">
+      <div className="max-w-6xl mx-auto px-6 lg:px-0 relative z-10">
         {/* Main footer content */}
         <div className="flex flex-col lg:flex-row lg:justify-between gap-8 mb-12">
           {/* Brand section */}

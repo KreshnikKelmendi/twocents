@@ -34,6 +34,7 @@ const Poll: React.FC<PollProps> = ({ postUUID }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showAnimation, setShowAnimation] = useState(false);
+  const [showResults, setShowResults] = useState(false);
 
   const fetchPoll = async () => {
     try {
@@ -164,43 +165,76 @@ const Poll: React.FC<PollProps> = ({ postUUID }) => {
     ...result
   }));
 
+  const handleShowResults = () => {
+    setShowResults(true);
+    // Trigger animation after a short delay
+    setTimeout(() => setShowAnimation(true), 100);
+  };
+
+  const handleHideResults = () => {
+    setShowResults(false);
+    setShowAnimation(false);
+  };
+
   return (
     <div className="bg-gradient-to-br from-white/8 to-white/3 backdrop-blur-sm border border-white/20 rounded-xl p-6 mb-6 shadow-lg">
       <h4 className="text-white font-bold text-lg mb-4">📊 Poll Results</h4>
-      <div className="space-y-3">
-        {resultsArray.map((result, index) => {
-          const percentage = totalVotes > 0 ? (result.votes / totalVotes) * 100 : 0;
-          return (
-            <div key={result.index} className="relative">
-              <div className="w-full text-left p-3 rounded-lg border border-white/10 bg-white/5">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-white/90 text-sm font-medium">Option {result.index + 1}</span>
-                  <span className="text-white/70 text-sm">
-                    {result.votes} votes ({percentage.toFixed(1)}%)
-                  </span>
+      
+      {!showResults ? (
+        <div className="text-center">
+          <button
+            onClick={handleShowResults}
+            className="px-6 py-3 bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-600 hover:to-yellow-600 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+          >
+            Click to Show Poll Results
+          </button>
+        </div>
+      ) : (
+        <div>
+          <div className="text-center mb-4">
+            <button
+              onClick={handleHideResults}
+              className="px-4 py-2 bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white text-sm font-medium rounded-lg shadow-md hover:shadow-lg transition-all duration-300"
+            >
+              Hide Results
+            </button>
+          </div>
+          <div className="space-y-3">
+            {resultsArray.map((result, index) => {
+              const percentage = totalVotes > 0 ? (result.votes / totalVotes) * 100 : 0;
+              return (
+                <div key={result.index} className="relative">
+                  <div className="w-full text-left p-3 rounded-lg border border-white/10 bg-white/5">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-white/90 text-xs font-medium">Option {result.index + 1}</span>
+                      <span className="text-white/70 text-xs">
+                        {result.votes} votes ({percentage.toFixed(1)}%)
+                      </span>
+                    </div>
+                    <div className="w-full bg-white/10 rounded-full h-2 overflow-hidden">
+                      <div 
+                        className={`bg-gradient-to-r from-orange-400 to-yellow-400 h-2 rounded-full transition-all duration-1500 ease-out ${
+                          showAnimation ? 'animate-pulse' : ''
+                        }`}
+                        style={{ 
+                          width: showAnimation ? `${percentage}%` : '0%',
+                          transitionDelay: `${index * 200}ms`
+                        }}
+                      ></div>
+                    </div>
+                    <div className="mt-2 text-xs text-white/60">
+                      Average Balance: ${result.average_balance.toLocaleString()}
+                    </div>
+                  </div>
                 </div>
-                <div className="w-full bg-white/10 rounded-full h-3 overflow-hidden">
-                  <div 
-                    className={`bg-gradient-to-r from-orange-400 to-yellow-400 h-3 rounded-full transition-all duration-1500 ease-out ${
-                      showAnimation ? 'animate-pulse' : ''
-                    }`}
-                    style={{ 
-                      width: showAnimation ? `${percentage}%` : '0%',
-                      transitionDelay: `${index * 200}ms`
-                    }}
-                  ></div>
-                </div>
-                <div className="mt-2 text-xs text-white/60">
-                  Average Balance: ${result.average_balance.toLocaleString()}
-                </div>
-              </div>
+              );
+            })}
+            <div className="mt-4 text-center text-white/50 text-xs">
+              Total votes: {totalVotes}
             </div>
-          );
-        })}
-      </div>
-      <div className="mt-4 text-center text-white/50 text-sm">
-        Total votes: {totalVotes}
-      </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
