@@ -19,9 +19,57 @@ const UserProfile: React.FC = () => {
         setLoading(true);
         setError(null);
         
-        // Get user data with recent posts
-        const userData = await fetchUserWithRecentPosts(userId);
-        console.log('🔍 User data with recent posts:', userData);
+        // Check if we have temporary user data from post click
+        const tempUserData = localStorage.getItem('tempUserData');
+        let userData;
+        
+        if (tempUserData) {
+          try {
+            const parsedTempData = JSON.parse(tempUserData);
+            console.log('🔍 Found temporary user data from post:', parsedTempData);
+            
+            // Check if the temp data matches the current user
+            if (parsedTempData.uuid === userId) {
+              console.log('✅ Using temporary user data for consistency');
+              
+              // Get the API data for recent posts
+              const apiUserData = await fetchUserWithRecentPosts(userId);
+              
+              // Merge the temp data with API data
+              const mergedUser = {
+                ...apiUserData.user,
+                username: parsedTempData.username,
+                balance: parsedTempData.balance,
+                bio: parsedTempData.bio,
+                age: parsedTempData.age,
+                gender: parsedTempData.gender,
+                arena: parsedTempData.arena
+              };
+              
+              userData = {
+                user: mergedUser,
+                recentPosts: apiUserData.recentPosts
+              };
+              
+              // Clear the temporary data
+              localStorage.removeItem('tempUserData');
+            } else {
+              // Temp data doesn't match, fetch normally
+              userData = await fetchUserWithRecentPosts(userId);
+            }
+          } catch (error) {
+            console.warn('Error parsing temporary user data:', error);
+            userData = await fetchUserWithRecentPosts(userId);
+          }
+        } else {
+          // No temp data, fetch normally
+          userData = await fetchUserWithRecentPosts(userId);
+        }
+        
+        console.log('🔍 Final user data:', userData);
+        console.log('🔍 User profile - Username:', userData.user.username);
+        console.log('🔍 User profile - Balance:', userData.user.balance);
+        console.log('🔍 User profile - Net worth formatted:', formatNetWorth(userData.user.balance));
         
         // Set the user data
         setUser(userData.user);
@@ -30,6 +78,13 @@ const UserProfile: React.FC = () => {
         if (userData.recentPosts && userData.recentPosts.length > 0) {
           console.log('✅ Found recentPosts!');
           console.log('🔍 Recent posts count:', userData.recentPosts.length);
+          
+          // Log the first post's author_meta for comparison
+          if (userData.recentPosts[0] && userData.recentPosts[0].author_meta) {
+            console.log('🔍 First post author_meta - Username:', userData.recentPosts[0].author_meta.username);
+            console.log('🔍 First post author_meta - Balance:', userData.recentPosts[0].author_meta.balance);
+          }
+          
           setPosts(userData.recentPosts);
           setIsShowingRecentPosts(true);
         } else {
@@ -192,7 +247,15 @@ const UserProfile: React.FC = () => {
                   <div 
                     key={post.uuid}
                     className="bg-gradient-to-br from-white/8 to-white/3 backdrop-blur-sm border border-white/20 rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] cursor-pointer"
-                    onClick={() => navigate(`/post/${post.uuid}`)}
+                    onClick={() => {
+                      navigate(`/post/${post.uuid}`);
+                      // Scroll to top on all devices
+                      document.documentElement.scrollTop = 0;
+                      document.body.scrollTop = 0;
+                      if (window.scrollTo) {
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      }
+                    }}
                   >
                     <h4 className="text-white font-bold text-xl mb-3">{post.title}</h4>
                     <p className="text-white/80 text-base mb-4 line-clamp-3">{post.text}</p>

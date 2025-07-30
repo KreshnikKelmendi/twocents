@@ -163,21 +163,42 @@ const PostDetail: React.FC = () => {
 
   const AuthorInfo: React.FC<{ author: any; size?: 'sm' | 'md' | 'lg' }> = ({ author, size = 'md' }) => {
     const sizeClasses = {
-      sm: { avatar: 'w-8 h-8 text-xs', name: 'text-sm', info: 'text-xs' },
-      md: { avatar: 'w-12 h-12 text-sm', name: 'text-base', info: 'text-xs' },
-      lg: { avatar: 'w-20 h-20 text-xl', name: 'text-2xl', info: 'text-sm' }
+      sm: { 
+        avatar: 'w-8 h-8 text-xs', 
+        name: 'text-sm', 
+        info: 'text-xs',
+        container: 'gap-2 sm:gap-4',
+        nameContainer: 'gap-2 sm:gap-3 mb-2',
+        infoContainer: 'flex flex-wrap items-center gap-1 sm:gap-3 text-white/60'
+      },
+      md: { 
+        avatar: 'w-12 h-12 text-sm', 
+        name: 'text-base', 
+        info: 'text-xs',
+        container: 'gap-3 sm:gap-4',
+        nameContainer: 'gap-2 sm:gap-3 mb-2',
+        infoContainer: 'flex flex-wrap items-center gap-1 sm:gap-3 text-white/60'
+      },
+      lg: { 
+        avatar: 'w-16 h-16 sm:w-20 sm:h-20 text-lg sm:text-xl', 
+        name: 'text-xl sm:text-2xl', 
+        info: 'text-xs sm:text-sm',
+        container: 'gap-3 sm:gap-4',
+        nameContainer: 'gap-2 sm:gap-3 mb-3',
+        infoContainer: 'flex flex-wrap items-center gap-1 sm:gap-3 text-white/60'
+      }
     };
     
     const classes = sizeClasses[size];
     
     return (
-      <div className="flex items-start gap-4">
-        <div className={`${classes.avatar} rounded-full flex items-center justify-center font-bold text-black shadow-lg ${getNetWorthColor(author?.balance || 0)}`}>
+      <div className={`flex items-start ${classes.container}`}>
+        <div className={`${classes.avatar} rounded-full flex items-center justify-center font-bold text-black shadow-lg ${getNetWorthColor(author?.balance || 0)} flex-shrink-0`}>
           {getInitials(author?.username || 'Anonymous')}
         </div>
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-3 mb-2">
-            <h4 className={`text-white font-semibold ${classes.name}`}>
+          <div className={`flex flex-col sm:flex-row sm:items-center ${classes.nameContainer}`}>
+            <h4 className={`text-white font-semibold ${classes.name} break-words`}>
               {author?.username || 'Anonymous'}
             </h4>
             {author?.author_uuid && (
@@ -187,31 +208,31 @@ const PostDetail: React.FC = () => {
                   // Scroll to top when navigating to user profile - iOS compatible
                   scrollToTop();
                 }}
-                className={`px-3 py-1 rounded-full text-xs font-bold shadow-md ${getNetWorthColor(author?.balance || 0)} text-black hover:scale-105 transition-transform duration-200 cursor-pointer`}
+                className={`px-2 sm:px-3 py-1 rounded-full text-xs font-bold shadow-md ${getNetWorthColor(author?.balance || 0)} text-black hover:scale-105 transition-transform duration-200 cursor-pointer self-start sm:self-auto`}
               >
                 {formatNetWorth(author?.balance || 0)}
               </button>
             )}
             {!author?.author_uuid && (
-              <span className={`px-3 py-1 rounded-full text-xs font-bold shadow-md ${getNetWorthColor(author?.balance || 0)} text-black`}>
+              <span className={`px-2 sm:px-3 py-1 rounded-full text-xs font-bold shadow-md ${getNetWorthColor(author?.balance || 0)} text-black self-start sm:self-auto`}>
                 {formatNetWorth(author?.balance || 0)}
               </span>
             )}
           </div>
-          <div className="flex items-center gap-3 text-white/60">
+          <div className={classes.infoContainer}>
             {author?.age && (
-              <span className={`${classes.info} flex items-center gap-1`}>
-                🎂 {author.age} years
+              <span className={`${classes.info} flex items-center gap-1 bg-white/5 px-2 py-1 rounded-lg`}>
+                🎂 <span className="hidden sm:inline">{author.age} years</span><span className="sm:hidden">{author.age}y</span>
               </span>
             )}
             {author?.gender && (
-              <span className={`${classes.info} flex items-center gap-1`}>
-                {getGenderIcon(author.gender)} {author.gender}
+              <span className={`${classes.info} flex items-center gap-1 bg-white/5 px-2 py-1 rounded-lg`}>
+                {getGenderIcon(author.gender)} <span className="hidden sm:inline">{author.gender}</span><span className="sm:hidden">{author.gender.charAt(0).toUpperCase()}</span>
               </span>
             )}
             {author?.arena && (
-              <span className={`${classes.info} flex items-center gap-1`}>
-                📍 {author.arena}
+              <span className={`${classes.info} flex items-center gap-1 bg-white/5 px-2 py-1 rounded-lg`}>
+                📍 <span className="hidden sm:inline">{author.arena}</span><span className="sm:hidden">{author.arena}</span>
               </span>
             )}
           </div>
@@ -223,11 +244,11 @@ const PostDetail: React.FC = () => {
 
 
   const CommentComponent: React.FC<{ comment: Comment; level?: number }> = ({ comment, level = 0 }) => (
-    <div className={`${level > 0 ? 'ml-8 border-l-2 border-gradient-to-b from-orange-500/30 to-yellow-500/30 pl-6' : ''}`}>
-      <div className="bg-gradient-to-br from-white/8 to-white/3 backdrop-blur-sm border border-white/20 rounded-xl p-5 mb-4 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
+    <div className={`${level > 0 ? 'ml-4 sm:ml-8 border-l-2 border-gradient-to-b from-orange-500/30 to-yellow-500/30 pl-3 sm:pl-6' : ''}`}>
+      <div className="bg-gradient-to-br from-white/8 to-white/3 backdrop-blur-sm border border-white/20 rounded-xl p-3 sm:p-5 mb-3 sm:mb-4 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]">
         <AuthorInfo author={comment.author_meta} size="sm" />
-        <div className="mt-4">
-          <p className="text-white/90 text-sm mb-4 leading-relaxed">{comment.text}</p>
+        <div className="mt-3 sm:mt-4">
+          <p className="text-white/90 text-sm mb-3 sm:mb-4 leading-relaxed break-words">{comment.text}</p>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
             <div className="flex items-center gap-2 sm:gap-4 text-white/60 text-xs sm:text-sm">
               <div className="flex items-center gap-1 sm:gap-2 bg-white/10 px-2 py-1 rounded-lg">
@@ -236,7 +257,6 @@ const PostDetail: React.FC = () => {
                   <AnimatedCounter value={comment.upvote_count || 0} />
                 </span>
                 <span className="text-white/60 text-xs hidden sm:inline">upvotes</span>
-                <span className="text-white/60 text-xs sm:hidden">↑</span>
               </div>
             </div>
             <span className="text-white/50 text-xs bg-white/10 px-2 py-1 rounded-full self-start sm:self-auto">
@@ -246,7 +266,7 @@ const PostDetail: React.FC = () => {
         </div>
       </div>
       {comment.replies && comment.replies.length > 0 && (
-        <div className="space-y-3">
+        <div className="space-y-2 sm:space-y-3">
           {comment.replies.map((reply) => (
             <CommentComponent key={reply.uuid} comment={reply} level={level + 1} />
           ))}
@@ -291,30 +311,30 @@ const PostDetail: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col">
       {/* Header */}
-      <div className="p-4">
+      <div className="p-3 sm:p-4">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <button
             onClick={() => navigate('/')}
-            className="px-4 py-2 text-white rounded-xl hover:bg-white/10 transition-all duration-200 font-medium"
+            className="px-3 sm:px-4 py-2 text-white rounded-xl hover:bg-white/10 transition-all duration-200 font-medium text-sm sm:text-base"
           >
             ← Back to Feed
           </button>
-          <h1 className="text-white font-bold text-xl">
+          <h1 className="text-white font-bold text-lg sm:text-xl">
             Post Details
           </h1>
-          <div className="w-32"></div>
+          <div className="w-24 sm:w-32"></div>
         </div>
       </div>
 
       {/* Content */}
       <div className="flex-1">
-        <div className="max-w-6xl mx-auto px-6 py-8">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 sm:py-8">
           {/* Main Post */}
-          <div className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-md border border-white/20 rounded-2xl p-8 mb-8 shadow-2xl">
+          <div className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-md border border-white/20 rounded-2xl p-4 sm:p-6 lg:p-8 mb-6 sm:mb-8 shadow-2xl">
             <AuthorInfo author={post.author_meta} size="lg" />
-            <div className="mt-6">
-              <h3 className="text-white font-bold text-3xl mb-4 leading-tight">{post.title || 'No title'}</h3>
-              <p className="text-white/90 text-lg mb-6 leading-relaxed">{post.text || 'No content available'}</p>
+            <div className="mt-4 sm:mt-6">
+              <h3 className="text-white font-bold text-xl sm:text-2xl lg:text-3xl mb-3 sm:mb-4 leading-tight break-words">{post.title || 'No title'}</h3>
+              <p className="text-white/90 text-base sm:text-lg mb-4 sm:mb-6 leading-relaxed break-words">{post.text || 'No content available'}</p>
               <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-white/70 text-sm sm:text-base">
                 <div className="flex items-center gap-1 sm:gap-2 bg-white/10 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg">
                   <span className="text-orange-400 text-sm sm:text-base">↑</span>
@@ -322,7 +342,6 @@ const PostDetail: React.FC = () => {
                     <AnimatedCounter value={post.upvote_count || 0} />
                   </span>
                   <span className="text-white/60 text-xs sm:text-sm hidden sm:inline">upvotes</span>
-                  <span className="text-white/60 text-xs sm:inline">↑</span>
                 </div>
                 <div className="flex items-center gap-1 sm:gap-2 bg-white/10 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg">
                   <span className="text-blue-400 text-sm sm:text-base">💬</span>
@@ -330,7 +349,6 @@ const PostDetail: React.FC = () => {
                     <AnimatedCounter value={post.comment_count || 0} />
                   </span>
                   <span className="text-white/60 text-xs sm:text-sm hidden sm:inline">comments</span>
-                  <span className="text-white/60 text-xs sm:inline">💬</span>
                 </div>
                 <div className="flex items-center gap-1 sm:gap-2 bg-white/10 px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg">
                   <span className="text-green-400 text-sm sm:text-base">👁️</span>
@@ -338,7 +356,6 @@ const PostDetail: React.FC = () => {
                     <AnimatedCounter value={post.view_count || 0} />
                   </span>
                   <span className="text-white/60 text-xs sm:text-sm hidden sm:inline">views</span>
-                  <span className="text-white/60 text-xs sm:inline">👁️</span>
                 </div>
               </div>
             </div>
@@ -349,20 +366,20 @@ const PostDetail: React.FC = () => {
 
           {/* Comments */}
           <div>
-            <h3 className="text-white text-2xl font-bold mb-6 bg-gradient-to-r from-orange-400 to-yellow-400 bg-clip-text text-transparent">
+            <h3 className="text-white text-xl sm:text-2xl font-bold mb-4 sm:mb-6 bg-gradient-to-r from-orange-400 to-yellow-400 bg-clip-text text-transparent">
               Comments ({(post.comment_count || 0)})
             </h3>
             {comments && comments.length > 0 ? (
-              <div className="space-y-4">
+              <div className="space-y-3 sm:space-y-4">
                 {comments.map((comment) => (
                   <CommentComponent key={comment.uuid} comment={comment} />
                 ))}
               </div>
             ) : (
-              <div className="text-center text-white/60 py-16">
-                <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8">
-                  <p className="text-xl mb-2">No comments yet</p>
-                  <p className="text-white/40">Be the first to share your thoughts!</p>
+              <div className="text-center text-white/60 py-8 sm:py-16">
+                <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-4 sm:p-8">
+                  <p className="text-lg sm:text-xl mb-2">No comments yet</p>
+                  <p className="text-white/40 text-sm sm:text-base">Be the first to share your thoughts!</p>
                 </div>
               </div>
             )}

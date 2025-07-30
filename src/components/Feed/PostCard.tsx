@@ -131,6 +131,20 @@ const PostCard: React.FC<PostCardProps> = ({ post, index, onPostClick }) => {
 
   const handleUserProfileClick = (e: React.MouseEvent) => {
     e.stopPropagation();
+    
+    // Store the post's author_meta data for consistency
+    if (post.author_meta) {
+      localStorage.setItem('tempUserData', JSON.stringify({
+        uuid: post.author_uuid,
+        username: post.author_meta.username,
+        balance: post.author_meta.balance,
+        bio: post.author_meta.bio,
+        age: post.author_meta.age,
+        gender: post.author_meta.gender,
+        arena: post.author_meta.arena
+      }));
+    }
+    
     navigate(`/user/${post.author_uuid}`);
     // Scroll to top when navigating to user profile - iOS compatible
     document.documentElement.scrollTop = 0;
