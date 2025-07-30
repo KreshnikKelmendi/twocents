@@ -70,6 +70,7 @@ const Header = () => {
                 >
                   Profile
                 </button>
+
               </nav>
             </div>
 
@@ -195,6 +196,7 @@ const Header = () => {
               >
                 Profile
               </button>
+
             </nav>
           </div>
 
@@ -270,6 +272,7 @@ const Header = () => {
               >
                 Profile
               </button>
+
             </div>
           </nav>
         )}

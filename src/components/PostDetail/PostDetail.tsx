@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { fetchPost, fetchPoll, fetchComments, votePoll, Post, Comment, Poll, useVoteState } from '../../utils/api';
+import { fetchPost, fetchComments, Post, Comment, useVoteState } from '../../utils/api';
+import Poll from '../Poll/Poll';
 
 const PostDetail: React.FC = () => {
   const { postId } = useParams<{ postId: string }>();
   const navigate = useNavigate();
   const [post, setPost] = useState<Post | null>(null);
-  const [poll, setPoll] = useState<Poll | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -78,10 +78,9 @@ const PostDetail: React.FC = () => {
       setLoading(true);
       setError(null);
       
-      // Fetch post, poll, and comments in parallel
-      const [postData, pollData, commentsData] = await Promise.allSettled([
+      // Fetch post and comments in parallel
+      const [postData, commentsData] = await Promise.allSettled([
         fetchPost(postId),
-        fetchPoll(postId),
         fetchComments(postId)
       ]);
       
@@ -98,13 +97,6 @@ const PostDetail: React.FC = () => {
         } else {
           throw error;
         }
-      }
-      
-      if (pollData.status === 'fulfilled') {
-        setPoll(pollData.value);
-      } else {
-        // Poll is optional, so we just log the warning
-        console.warn('Failed to fetch poll:', pollData.reason);
       }
       
       if (commentsData.status === 'fulfilled') {
@@ -228,111 +220,7 @@ const PostDetail: React.FC = () => {
     );
   };
 
-  const PollComponent: React.FC<{ poll: Poll }> = ({ poll }) => {
-    const [localPoll, setLocalPoll] = useState<Poll>(poll);
-    const [voting, setVoting] = useState<string | null>(null);
-    const [showAnimation, setShowAnimation] = useState(false);
 
-    useEffect(() => {
-      setLocalPoll(poll);
-      // Trigger animation after a short delay
-      const timer = setTimeout(() => setShowAnimation(true), 100);
-      return () => clearTimeout(timer);
-    }, [poll]);
-
-    const handleVote = async (optionUUID: string) => {
-      if (voting || localPoll.user_vote) return; // Prevent double voting
-
-      try {
-        setVoting(optionUUID);
-        await votePoll(poll.uuid, optionUUID);
-        
-        // Update local state optimistically
-        const updatedOptions = localPoll.options.map(option => {
-          if (option.uuid === optionUUID) {
-            return { ...option, vote_count: option.vote_count + 1 };
-          }
-          return option;
-        });
-
-        // Recalculate percentages
-        const totalVotes = updatedOptions.reduce((sum, option) => sum + option.vote_count, 0);
-        const updatedOptionsWithPercentages = updatedOptions.map(option => ({
-          ...option,
-          percentage: totalVotes > 0 ? (option.vote_count / totalVotes) * 100 : 0
-        }));
-
-        setLocalPoll({
-          ...localPoll,
-          options: updatedOptionsWithPercentages,
-          user_vote: optionUUID,
-          total_votes: totalVotes
-        });
-      } catch (error) {
-        console.error('Failed to vote:', error);
-        // You could show a toast notification here
-      } finally {
-        setVoting(null);
-      }
-    };
-
-    return (
-      <div className="bg-gradient-to-br from-white/8 to-white/3 backdrop-blur-sm border border-white/20 rounded-xl p-6 mb-6 shadow-lg">
-        <h4 className="text-white font-bold text-lg mb-4">📊 {localPoll.question}</h4>
-        <div className="space-y-3">
-          {localPoll.options.map((option, index) => (
-            <div key={option.uuid} className="relative">
-              <button
-                onClick={() => handleVote(option.uuid)}
-                disabled={voting !== null || !!localPoll.user_vote}
-                className={`w-full text-left p-3 rounded-lg transition-all duration-200 ${
-                  localPoll.user_vote === option.uuid
-                    ? 'bg-green-500/20 border border-green-500/50'
-                    : voting === option.uuid
-                    ? 'bg-orange-500/20 border border-orange-500/50'
-                    : 'hover:bg-white/10 border border-transparent'
-                } ${voting !== null || !!localPoll.user_vote ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'}`}
-              >
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-white/90 text-sm font-medium">{option.text}</span>
-                  <span className="text-white/70 text-sm">
-                    {option.vote_count} votes ({option.percentage.toFixed(1)}%)
-                  </span>
-                </div>
-                <div className="w-full bg-white/10 rounded-full h-3 overflow-hidden">
-                  <div 
-                    className={`bg-gradient-to-r from-orange-400 to-yellow-400 h-3 rounded-full transition-all duration-1500 ease-out ${
-                      showAnimation ? 'animate-pulse' : ''
-                    }`}
-                    style={{ 
-                      width: showAnimation ? `${option.percentage}%` : '0%',
-                      transitionDelay: `${index * 200}ms`
-                    }}
-                  ></div>
-                </div>
-                {localPoll.user_vote === option.uuid && (
-                  <div className="absolute -top-1 -right-1 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
-                    <span className="text-white text-xs">✓</span>
-                  </div>
-                )}
-                {voting === option.uuid && (
-                  <div className="absolute -top-1 -right-1 w-6 h-6 bg-orange-500 rounded-full flex items-center justify-center">
-                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
-                  </div>
-                )}
-              </button>
-            </div>
-          ))}
-        </div>
-        <div className="mt-4 text-center text-white/50 text-sm">
-          Total votes: {localPoll.total_votes}
-          {localPoll.user_vote && (
-            <span className="ml-2 text-green-400">✓ You voted</span>
-          )}
-        </div>
-      </div>
-    );
-  };
 
   const CommentComponent: React.FC<{ comment: Comment; level?: number }> = ({ comment, level = 0 }) => (
     <div className={`${level > 0 ? 'ml-8 border-l-2 border-gradient-to-b from-orange-500/30 to-yellow-500/30 pl-6' : ''}`}>
@@ -454,7 +342,7 @@ const PostDetail: React.FC = () => {
           </div>
 
           {/* Poll */}
-          {poll && <PollComponent poll={poll} />}
+          <Poll postUUID={postId || ''} />
 
           {/* Comments */}
           <div>

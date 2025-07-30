@@ -68,12 +68,18 @@ const Feed: React.FC = () => {
     try {
       setLoading(true);
       setError(null);
+      console.log('🔍 Fetching posts with filter:', filter);
       const apiPosts = await fetchPosts(filter);
+      console.log('📊 API Response - Raw data:', apiPosts);
+      console.log('📊 API Response - Number of posts:', apiPosts.length);
+      console.log('📊 API Response - First post sample:', apiPosts[0]);
       setPosts(apiPosts.slice(0, 100));
+      console.log('📊 Posts set to state (first 100):', apiPosts.slice(0, 100).length);
       if (resetPage) {
         setCurrentPage(1);
       }
     } catch (err: any) {
+      console.error('❌ Error fetching posts:', err);
       setError(`Failed to load posts: ${err.message}`);
       setPosts([]);
     } finally {
@@ -127,6 +133,7 @@ const Feed: React.FC = () => {
   }, [showMobileFilters]);
 
   const handleFilterChange = async (filter: TwoCentsFilter) => {
+    console.log('🔄 Filter changed to:', filter);
     setCurrentFilter(filter);
     setShowMobileFilters(false); // Close mobile dropdown when filter is selected
     // Clear saved scroll position when changing filters
@@ -166,6 +173,13 @@ const Feed: React.FC = () => {
   const startIndex = (currentPage - 1) * postsPerPage;
   const endIndex = startIndex + postsPerPage;
   const currentPosts = posts.slice(startIndex, endIndex);
+  
+  // Console log current posts being displayed
+  console.log('📄 Current page:', currentPage);
+  console.log('📄 Posts per page:', postsPerPage);
+  console.log('📄 Total posts available:', posts.length);
+  console.log('📄 Current posts being displayed:', currentPosts.length);
+  console.log('📄 Current posts data:', currentPosts);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
