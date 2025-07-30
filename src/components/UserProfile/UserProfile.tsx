@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { fetchUser, fetchUserPosts, User, Post } from '../../utils/api';
+import { fetchUser, fetchUserPosts, fetchUserWithRecentPosts, User, Post, api } from '../../utils/api';
 
 const UserProfile: React.FC = () => {
   const { userId } = useParams<{ userId: string }>();
   const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
+  const [isShowingRecentPosts, setIsShowingRecentPosts] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -18,22 +19,23 @@ const UserProfile: React.FC = () => {
         setLoading(true);
         setError(null);
         
-        const [userData, postsData] = await Promise.allSettled([
-          fetchUser(userId),
-          fetchUserPosts(userId)
-        ]);
+        // Get user data with recent posts
+        const userData = await fetchUserWithRecentPosts(userId);
+        console.log('🔍 User data with recent posts:', userData);
         
-        if (userData.status === 'fulfilled') {
-          setUser(userData.value);
-        } else {
-          throw userData.reason;
-        }
+        // Set the user data
+        setUser(userData.user);
         
-        if (postsData.status === 'fulfilled') {
-          setPosts(postsData.value);
+        // Check if recentPosts exist
+        if (userData.recentPosts && userData.recentPosts.length > 0) {
+          console.log('✅ Found recentPosts!');
+          console.log('🔍 Recent posts count:', userData.recentPosts.length);
+          setPosts(userData.recentPosts);
+          setIsShowingRecentPosts(true);
         } else {
-          console.warn('Failed to fetch user posts:', postsData.reason);
+          console.log('❌ No recentPosts found');
           setPosts([]);
+          setIsShowingRecentPosts(false);
         }
         
       } catch (err: any) {
@@ -174,9 +176,16 @@ const UserProfile: React.FC = () => {
 
           {/* User Posts */}
           <div>
-            <h3 className="text-white text-2xl font-bold mb-6 bg-gradient-to-r from-orange-400 to-yellow-400 bg-clip-text text-transparent">
-              Posts ({posts.length})
-            </h3>
+            <div className="mb-6">
+              <h3 className="text-white text-2xl font-bold bg-gradient-to-r from-orange-400 to-yellow-400 bg-clip-text text-transparent">
+                {isShowingRecentPosts ? 'Recent Posts' : 'Posts'} ({posts.length})
+              </h3>
+              {isShowingRecentPosts && (
+                <p className="text-white/60 text-sm mt-2">
+                  Showing the most recent posts from this user
+                </p>
+              )}
+            </div>
             {posts.length > 0 ? (
               <div className="space-y-6">
                 {posts.map((post) => (

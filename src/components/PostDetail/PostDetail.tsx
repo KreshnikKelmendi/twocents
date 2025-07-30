@@ -284,6 +284,9 @@ const PostDetail: React.FC = () => {
   }
 
   console.log('Comments state:', comments);
+  console.log('Post data:', post);
+  console.log('Post meta:', post?.post_meta);
+  console.log('Poll options:', post?.post_meta?.poll);
   
   return (
     <div className="min-h-screen flex flex-col">
@@ -342,7 +345,7 @@ const PostDetail: React.FC = () => {
           </div>
 
           {/* Poll */}
-          <Poll postUUID={postId || ''} />
+          <Poll postUUID={postId || ''} pollOptions={post.post_meta?.poll} />
 
           {/* Comments */}
           <div>

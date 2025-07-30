@@ -32,6 +32,9 @@ export interface Post {
     subscription?: string;
     username?: string;
   };
+  post_meta?: {
+    poll?: string[];
+  };
   comments?: Comment[];
 }
 
@@ -81,6 +84,7 @@ export interface User {
   subscription_type: number;
   created_at: string;
   updated_at: string;
+  recentPosts?: Post[]; // Add recentPosts field
 }
 
 export interface PostsFeedResponse {
@@ -224,8 +228,8 @@ export class TwoCentsAPI {
     return this.call<void>('/v1/polls/vote', { poll_uuid: pollUUID, option_uuid: optionUUID });
   }
 
-  async getUser(userUUID: string): Promise<{ user: User }> {
-    return this.call<{ user: User }>('/v1/users/get', { user_uuid: userUUID });
+  async getUser(userUUID: string): Promise<{ user: User; recentPosts?: Post[]; totalUpvotes?: number; recentCommentsEnriched?: any[]; recentPostsEnriched?: any[]; aliasesGiven?: any[]; aliasesReceived?: any[] }> {
+    return this.call<{ user: User; recentPosts?: Post[]; totalUpvotes?: number; recentCommentsEnriched?: any[]; recentPostsEnriched?: any[]; aliasesGiven?: any[]; aliasesReceived?: any[] }>('/v1/users/get', { user_uuid: userUUID });
   }
 
   async getUserPosts(userUUID: string): Promise<{ posts: Post[] }> {
@@ -334,6 +338,15 @@ export const fetchUserPosts = async (userUUID: string): Promise<Post[]> => {
   try {
     const response = await api.getUserPosts(userUUID);
     return response.posts || [];
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const fetchUserWithRecentPosts = async (userUUID: string): Promise<{ user: User; recentPosts?: Post[] }> => {
+  try {
+    const response = await api.getUser(userUUID);
+    return { user: response.user, recentPosts: response.recentPosts };
   } catch (error) {
     throw error;
   }

@@ -27,9 +27,10 @@ export interface Poll {
 
 interface PollProps {
   postUUID: string;
+  pollOptions?: string[];
 }
 
-const Poll: React.FC<PollProps> = ({ postUUID }) => {
+const Poll: React.FC<PollProps> = ({ postUUID, pollOptions }) => {
   const [pollResults, setPollResults] = useState<PollResults | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -66,6 +67,7 @@ const Poll: React.FC<PollProps> = ({ postUUID }) => {
       
       if (response.data && response.data.result && response.data.result.results) {
         console.log('🎯 Poll results found:', response.data.result.results);
+        console.log('📊 Poll results structure:', response.data.result);
         setPollResults(response.data.result);
         // Trigger animation after a short delay
         setTimeout(() => setShowAnimation(true), 100);
@@ -107,6 +109,7 @@ const Poll: React.FC<PollProps> = ({ postUUID }) => {
 
   useEffect(() => {
     console.log('🎯 Poll component mounted with postUUID:', postUUID);
+    console.log('📊 Poll options received:', pollOptions);
     if (postUUID && postUUID.trim() !== '') {
       console.log('🚀 Starting to fetch poll...');
       fetchPoll();
@@ -114,7 +117,7 @@ const Poll: React.FC<PollProps> = ({ postUUID }) => {
       console.log('⚠️ No valid postUUID provided, skipping poll fetch');
       setPollResults(null);
     }
-  }, [postUUID]);
+  }, [postUUID, pollOptions]);
 
   if (loading) {
     return (
@@ -160,10 +163,16 @@ const Poll: React.FC<PollProps> = ({ postUUID }) => {
 
   // Calculate total votes and percentages
   const totalVotes = Object.values(pollResults.results).reduce((sum, result) => sum + result.votes, 0);
-  const resultsArray = Object.entries(pollResults.results).map(([index, result]) => ({
-    index: parseInt(index),
-    ...result
-  }));
+  const resultsArray = Object.entries(pollResults.results)
+    .map(([index, result]) => ({
+      index: parseInt(index),
+      ...result
+    }))
+    .filter(result => result.votes > 0); // Filter out options with zero votes
+  
+  console.log('📊 Total votes:', totalVotes);
+  console.log('📊 Results array before filtering:', Object.entries(pollResults.results).map(([index, result]) => ({ index: parseInt(index), ...result })));
+  console.log('📊 Results array after filtering (zero votes removed):', resultsArray);
 
   const handleShowResults = () => {
     setShowResults(true);
@@ -202,11 +211,14 @@ const Poll: React.FC<PollProps> = ({ postUUID }) => {
           <div className="space-y-3">
             {resultsArray.map((result, index) => {
               const percentage = totalVotes > 0 ? (result.votes / totalVotes) * 100 : 0;
+              const optionText = pollOptions && pollOptions[result.index] 
+                ? pollOptions[result.index] 
+                : `Option ${result.index + 1}`;
               return (
                 <div key={result.index} className="relative">
                   <div className="w-full text-left p-3 rounded-lg border border-white/10 bg-white/5">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-white/90 text-xs font-medium">Option {result.index + 1}</span>
+                      <span className="text-white/90 text-sm font-medium">{optionText}</span>
                       <span className="text-white/70 text-xs">
                         {result.votes} votes ({percentage.toFixed(1)}%)
                       </span>
