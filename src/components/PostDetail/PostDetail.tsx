@@ -100,10 +100,8 @@ const PostDetail: React.FC = () => {
       }
       
       if (commentsData.status === 'fulfilled') {
-        console.log('Comments data:', commentsData.value);
         setComments(commentsData.value);
       } else {
-        console.warn('Failed to fetch comments:', commentsData.reason);
         setComments([]);
       }
       // Comments are optional, so we don't throw if it fails
@@ -303,10 +301,7 @@ const PostDetail: React.FC = () => {
     );
   }
 
-  console.log('Comments state:', comments);
-  console.log('Post data:', post);
-  console.log('Post meta:', post?.post_meta);
-  console.log('Poll options:', post?.post_meta?.poll);
+
   
   return (
     <div className="min-h-screen flex flex-col">

@@ -48,7 +48,7 @@ const Feed: React.FC = () => {
           }, 100);
         }
       } catch (error) {
-        console.error('Error restoring scroll position:', error);
+        // Error restoring scroll position - continue normally
       }
     }
   };
@@ -62,24 +62,16 @@ const Feed: React.FC = () => {
     }
   };
 
-
-
   const fetchPostsData = async (filter: TwoCentsFilter = currentFilter, resetPage: boolean = true) => {
     try {
       setLoading(true);
       setError(null);
-      console.log('🔍 Fetching posts with filter:', filter);
       const apiPosts = await fetchPosts(filter);
-      console.log('📊 API Response - Raw data:', apiPosts);
-      console.log('📊 API Response - Number of posts:', apiPosts.length);
-      console.log('📊 API Response - First post sample:', apiPosts[0]);
       setPosts(apiPosts.slice(0, 100));
-      console.log('📊 Posts set to state (first 100):', apiPosts.slice(0, 100).length);
       if (resetPage) {
         setCurrentPage(1);
       }
     } catch (err: any) {
-      console.error('❌ Error fetching posts:', err);
       setError(`Failed to load posts: ${err.message}`);
       setPosts([]);
     } finally {
@@ -99,7 +91,7 @@ const Feed: React.FC = () => {
           return; // Don't fetch default data
         }
       } catch (error) {
-        console.error('Error checking saved data:', error);
+        // Error checking saved data - continue normally
       }
     }
     
@@ -133,7 +125,6 @@ const Feed: React.FC = () => {
   }, [showMobileFilters]);
 
   const handleFilterChange = async (filter: TwoCentsFilter) => {
-    console.log('🔄 Filter changed to:', filter);
     setCurrentFilter(filter);
     setShowMobileFilters(false); // Close mobile dropdown when filter is selected
     // Clear saved scroll position when changing filters
@@ -157,8 +148,6 @@ const Feed: React.FC = () => {
     }
   };
 
-
-
   const handlePostClick = (postId: string) => {
     // Save current scroll position and state before navigating
     saveScrollPosition();
@@ -167,19 +156,11 @@ const Feed: React.FC = () => {
     scrollToTop();
   };
 
-
   // Pagination calculations
   const totalPages = Math.ceil(posts.length / postsPerPage);
   const startIndex = (currentPage - 1) * postsPerPage;
   const endIndex = startIndex + postsPerPage;
   const currentPosts = posts.slice(startIndex, endIndex);
-  
-  // Console log current posts being displayed
-  console.log('📄 Current page:', currentPage);
-  console.log('📄 Posts per page:', postsPerPage);
-  console.log('📄 Total posts available:', posts.length);
-  console.log('📄 Current posts being displayed:', currentPosts.length);
-  console.log('📄 Current posts data:', currentPosts);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);

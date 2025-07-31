@@ -26,11 +26,9 @@ const UserProfile: React.FC = () => {
         if (tempUserData) {
           try {
             const parsedTempData = JSON.parse(tempUserData);
-            console.log('🔍 Found temporary user data from post:', parsedTempData);
             
             // Check if the temp data matches the current user
             if (parsedTempData.uuid === userId) {
-              console.log('✅ Using temporary user data for consistency');
               
               // Get the API data for recent posts
               const apiUserData = await fetchUserWithRecentPosts(userId);
@@ -58,7 +56,6 @@ const UserProfile: React.FC = () => {
               userData = await fetchUserWithRecentPosts(userId);
             }
           } catch (error) {
-            console.warn('Error parsing temporary user data:', error);
             userData = await fetchUserWithRecentPosts(userId);
           }
         } else {
@@ -66,29 +63,14 @@ const UserProfile: React.FC = () => {
           userData = await fetchUserWithRecentPosts(userId);
         }
         
-        console.log('🔍 Final user data:', userData);
-        console.log('🔍 User profile - Username:', userData.user.username);
-        console.log('🔍 User profile - Balance:', userData.user.balance);
-        console.log('🔍 User profile - Net worth formatted:', formatNetWorth(userData.user.balance));
-        
         // Set the user data
         setUser(userData.user);
         
         // Check if recentPosts exist
         if (userData.recentPosts && userData.recentPosts.length > 0) {
-          console.log('✅ Found recentPosts!');
-          console.log('🔍 Recent posts count:', userData.recentPosts.length);
-          
-          // Log the first post's author_meta for comparison
-          if (userData.recentPosts[0] && userData.recentPosts[0].author_meta) {
-            console.log('🔍 First post author_meta - Username:', userData.recentPosts[0].author_meta.username);
-            console.log('🔍 First post author_meta - Balance:', userData.recentPosts[0].author_meta.balance);
-          }
-          
           setPosts(userData.recentPosts);
           setIsShowingRecentPosts(true);
         } else {
-          console.log('❌ No recentPosts found');
           setPosts([]);
           setIsShowingRecentPosts(false);
         }
@@ -164,7 +146,10 @@ const UserProfile: React.FC = () => {
           <p>{error || 'User not found'}</p>
         </div>
         <button
-          onClick={() => navigate('/')}
+                      onClick={() => {
+              sessionStorage.setItem('hasNavigated', 'true');
+              navigate('/');
+            }}
           className="mt-6 px-6 py-3 bg-gradient-to-r from-orange-500 to-yellow-500 text-black rounded-xl hover:from-orange-600 hover:to-yellow-600 transition-all duration-200 font-semibold shadow-lg"
         >
           ← Back to Feed
@@ -176,52 +161,55 @@ const UserProfile: React.FC = () => {
   return (
     <div className="min-h-screen flex flex-col">
       {/* Header */}
-      <div className="p-4">
+      <div className="p-3 sm:p-4">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <button
-            onClick={() => navigate('/')}
-            className="px-4 py-2 text-white rounded-xl hover:bg-white/10 transition-all duration-200 font-medium"
+            onClick={() => {
+              sessionStorage.setItem('hasNavigated', 'true');
+              navigate('/');
+            }}
+            className="px-3 sm:px-4 py-2 text-white rounded-xl hover:bg-white/10 transition-all duration-200 font-medium text-sm sm:text-base"
           >
             ← Back to Feed
           </button>
-          <h1 className="text-white font-bold text-xl">
+          <h1 className="text-white font-bold text-lg sm:text-xl">
             User Profile
           </h1>
-          <div className="w-32"></div>
+          <div className="w-24 sm:w-32"></div>
         </div>
       </div>
 
       {/* Content */}
       <div className="flex-1">
-        <div className="max-w-6xl mx-auto px-6 py-8">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 sm:py-8">
           {/* User Profile Card */}
-          <div className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-md border border-white/20 rounded-2xl p-8 mb-8 shadow-2xl">
-            <div className="flex items-start gap-6">
-              <div className={`w-24 h-24 rounded-full flex items-center justify-center font-bold text-black shadow-lg text-2xl ${getNetWorthColor(user.balance)}`}>
+          <div className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-md border border-white/20 rounded-2xl p-4 sm:p-6 lg:p-8 mb-6 sm:mb-8 shadow-2xl">
+            <div className="flex items-start gap-3 sm:gap-6">
+              <div className={`w-16 h-16 sm:w-24 sm:h-24 rounded-full flex items-center justify-center font-bold text-black shadow-lg text-lg sm:text-2xl ${getNetWorthColor(user.balance)}`}>
                 {getInitials(user.username)}
               </div>
-              <div className="flex-1">
-                <div className="flex items-center gap-4 mb-4">
-                  <h2 className="text-white font-bold text-3xl">{user.username}</h2>
-                  <span className={`px-4 py-2 rounded-full text-sm font-bold shadow-md ${getNetWorthColor(user.balance)} text-black`}>
+              <div className="flex-1 min-w-0">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mb-3 sm:mb-4">
+                  <h2 className="text-white font-bold text-xl sm:text-2xl lg:text-3xl break-words">{user.username}</h2>
+                  <span className={`px-2 sm:px-4 py-1 sm:py-2 rounded-full text-xs sm:text-sm font-bold shadow-md ${getNetWorthColor(user.balance)} text-black self-start sm:self-auto`}>
                     {formatNetWorth(user.balance)}
                   </span>
                 </div>
-                <p className="text-white/80 text-lg mb-4">{user.bio}</p>
-                <div className="flex items-center gap-6 text-white/60">
+                <p className="text-white/80 text-sm sm:text-lg mb-3 sm:mb-4 break-words">{user.bio}</p>
+                <div className="flex flex-wrap items-center gap-2 sm:gap-6 text-white/60 text-xs sm:text-sm">
                   {user.age && (
-                    <span className="flex items-center gap-2">
-                      🎂 {user.age} years
+                    <span className="flex items-center gap-1 sm:gap-2 bg-white/5 px-2 py-1 rounded-lg">
+                      🎂 <span className="hidden sm:inline">{user.age} years</span><span className="sm:hidden">{user.age}y</span>
                     </span>
                   )}
                   {user.gender && (
-                    <span className="flex items-center gap-2">
-                      {getGenderIcon(user.gender)} {user.gender}
+                    <span className="flex items-center gap-1 sm:gap-2 bg-white/5 px-2 py-1 rounded-lg">
+                      {getGenderIcon(user.gender)} <span className="hidden sm:inline">{user.gender}</span><span className="sm:hidden">{user.gender.charAt(0).toUpperCase()}</span>
                     </span>
                   )}
                   {user.arena && (
-                    <span className="flex items-center gap-2">
-                      📍 {user.arena}
+                    <span className="flex items-center gap-1 sm:gap-2 bg-white/5 px-2 py-1 rounded-lg">
+                      📍 <span className="hidden sm:inline">{user.arena}</span><span className="sm:hidden">{user.arena}</span>
                     </span>
                   )}
                 </div>
@@ -231,22 +219,22 @@ const UserProfile: React.FC = () => {
 
           {/* User Posts */}
           <div>
-            <div className="mb-6">
-              <h3 className="text-white text-2xl font-bold bg-gradient-to-r from-orange-400 to-yellow-400 bg-clip-text text-transparent">
+            <div className="mb-4 sm:mb-6">
+              <h3 className="text-white text-xl sm:text-2xl font-bold bg-gradient-to-r from-orange-400 to-yellow-400 bg-clip-text text-transparent">
                 {isShowingRecentPosts ? 'Recent Posts' : 'Posts'} ({posts.length})
               </h3>
               {isShowingRecentPosts && (
-                <p className="text-white/60 text-sm mt-2">
+                <p className="text-white/60 text-xs sm:text-sm mt-2">
                   Showing the most recent posts from this user
                 </p>
               )}
             </div>
             {posts.length > 0 ? (
-              <div className="space-y-6">
+              <div className="space-y-3 sm:space-y-6">
                 {posts.map((post) => (
                   <div 
                     key={post.uuid}
-                    className="bg-gradient-to-br from-white/8 to-white/3 backdrop-blur-sm border border-white/20 rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] cursor-pointer"
+                    className="bg-gradient-to-br from-white/8 to-white/3 backdrop-blur-sm border border-white/20 rounded-xl p-3 sm:p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02] cursor-pointer"
                     onClick={() => {
                       navigate(`/post/${post.uuid}`);
                       // Scroll to top on all devices
@@ -257,24 +245,27 @@ const UserProfile: React.FC = () => {
                       }
                     }}
                   >
-                    <h4 className="text-white font-bold text-xl mb-3">{post.title}</h4>
-                    <p className="text-white/80 text-base mb-4 line-clamp-3">{post.text}</p>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-4 text-white/60 text-sm">
-                        <div className="flex items-center gap-2 bg-white/10 px-3 py-1 rounded-full">
-                          <span className="text-orange-400">↗</span>
-                          <span>{post.upvote_count.toLocaleString()}</span>
+                    <h4 className="text-white font-bold text-lg sm:text-xl mb-2 sm:mb-3 break-words">{post.title}</h4>
+                    <p className="text-white/80 text-sm sm:text-base mb-3 sm:mb-4 line-clamp-3 break-words">{post.text}</p>
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
+                      <div className="flex items-center gap-2 sm:gap-4 text-white/60 text-xs sm:text-sm">
+                        <div className="flex items-center gap-1 sm:gap-2 bg-white/10 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full">
+                          <span className="text-orange-400 text-xs sm:text-sm">↗</span>
+                          <span className="text-white font-medium text-xs sm:text-sm">{post.upvote_count.toLocaleString()}</span>
+                          <span className="text-white/60 text-xs hidden sm:inline">upvotes</span>
                         </div>
-                        <div className="flex items-center gap-2 bg-white/10 px-3 py-1 rounded-full">
-                          <span className="text-blue-400">💬</span>
-                          <span>{post.comment_count.toLocaleString()}</span>
+                        <div className="flex items-center gap-1 sm:gap-2 bg-white/10 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full">
+                          <span className="text-blue-400 text-xs sm:text-sm">💬</span>
+                          <span className="text-white font-medium text-xs sm:text-sm">{post.comment_count.toLocaleString()}</span>
+                          <span className="text-white/60 text-xs hidden sm:inline">comments</span>
                         </div>
-                        <div className="flex items-center gap-2 bg-white/10 px-3 py-1 rounded-full">
-                          <span className="text-green-400">👁️</span>
-                          <span>{post.view_count.toLocaleString()}</span>
+                        <div className="flex items-center gap-1 sm:gap-2 bg-white/10 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full">
+                          <span className="text-green-400 text-xs sm:text-sm">👁️</span>
+                          <span className="text-white font-medium text-xs sm:text-sm">{post.view_count.toLocaleString()}</span>
+                          <span className="text-white/60 text-xs hidden sm:inline">views</span>
                         </div>
                       </div>
-                      <span className="text-white/50 text-sm bg-white/10 px-3 py-1 rounded-full">
+                      <span className="text-white/50 text-xs sm:text-sm bg-white/10 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full self-start sm:self-auto">
                         {formatDate(post.created_at)}
                       </span>
                     </div>
@@ -282,10 +273,10 @@ const UserProfile: React.FC = () => {
                 ))}
               </div>
             ) : (
-              <div className="text-center text-white/60 py-16">
-                <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8">
-                  <p className="text-xl mb-2">No posts yet</p>
-                  <p className="text-white/40">This user hasn't made any posts.</p>
+              <div className="text-center text-white/60 py-8 sm:py-16">
+                <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-4 sm:p-8">
+                  <p className="text-lg sm:text-xl mb-2">No posts yet</p>
+                  <p className="text-white/40 text-sm sm:text-base">This user hasn't made any posts.</p>
                 </div>
               </div>
             )}

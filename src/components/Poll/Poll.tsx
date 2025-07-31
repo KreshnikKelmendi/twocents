@@ -42,17 +42,12 @@ const Poll: React.FC<PollProps> = ({ postUUID, pollOptions }) => {
       setLoading(true);
       setError(null);
       
-      console.log('🔍 Fetching poll for postUUID:', postUUID);
-      console.log('🌐 Making JSON-RPC request to:', `https://api.twocents.money/prod`);
-      
       const requestBody = {
         jsonrpc: '2.0',
         id: 'anon',
         method: '/v1/polls/get',
         params: { post_uuid: postUUID }
       };
-      
-      console.log('📋 Request body:', requestBody);
       
       const response = await axios.post(`https://api.twocents.money/prod`, requestBody, {
         headers: {
@@ -62,30 +57,16 @@ const Poll: React.FC<PollProps> = ({ postUUID, pollOptions }) => {
         timeout: 10000,
       });
       
-      console.log('✅ Poll API response:', response);
-      console.log('📊 Response data:', response.data);
-      
       if (response.data && response.data.result && response.data.result.results) {
-        console.log('🎯 Poll results found:', response.data.result.results);
-        console.log('📊 Poll results structure:', response.data.result);
         setPollResults(response.data.result);
         // Trigger animation after a short delay
         setTimeout(() => setShowAnimation(true), 100);
       } else if (response.data && response.data.error) {
-        console.log('❌ API Error:', response.data.error);
         setError(`API Error: ${response.data.error.message}`);
       } else {
-        console.log('❌ Unexpected response structure:', response.data);
         setError('Unexpected response format from server');
       }
     } catch (err: any) {
-      console.error('💥 Failed to fetch poll - Full error:', err);
-      console.error('💥 Error response:', err.response);
-      console.error('💥 Error message:', err.message);
-      console.error('💥 Error code:', err.code);
-      console.error('💥 Error status:', err.response?.status);
-      console.error('💥 Error status text:', err.response?.statusText);
-      console.error('💥 Error data:', err.response?.data);
       
       let errorMessage = 'Failed to load poll';
       
@@ -108,13 +89,9 @@ const Poll: React.FC<PollProps> = ({ postUUID, pollOptions }) => {
   };
 
   useEffect(() => {
-    console.log('🎯 Poll component mounted with postUUID:', postUUID);
-    console.log('📊 Poll options received:', pollOptions);
     if (postUUID && postUUID.trim() !== '') {
-      console.log('🚀 Starting to fetch poll...');
       fetchPoll();
     } else {
-      console.log('⚠️ No valid postUUID provided, skipping poll fetch');
       setPollResults(null);
     }
   }, [postUUID, pollOptions]);
@@ -170,9 +147,7 @@ const Poll: React.FC<PollProps> = ({ postUUID, pollOptions }) => {
     }))
     .filter(result => result.votes > 0); // Filter out options with zero votes
   
-  console.log('📊 Total votes:', totalVotes);
-  console.log('📊 Results array before filtering:', Object.entries(pollResults.results).map(([index, result]) => ({ index: parseInt(index), ...result })));
-  console.log('📊 Results array after filtering (zero votes removed):', resultsArray);
+
 
   const handleShowResults = () => {
     setShowResults(true);

@@ -10,13 +10,13 @@ module.exports = function(app) {
         '^/api': '', // Remove /api prefix when forwarding to target
       },
       onProxyReq: (proxyReq, req, res) => {
-        console.log('Proxying request to:', proxyReq.path);
+        // Proxy request logging disabled
       },
       onProxyRes: (proxyRes, req, res) => {
-        console.log('Proxy response status:', proxyRes.statusCode);
+        // Proxy response logging disabled
       },
       onError: (err, req, res) => {
-        console.error('Proxy error:', err.message);
+        // Proxy error logging disabled
       }
     })
   );
