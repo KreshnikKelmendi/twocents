@@ -8,8 +8,8 @@ import PostDetail from './components/PostDetail/PostDetail';
 import UserProfile from './components/UserProfile/UserProfile';
 import Footer from './components/Footer/Footer';
 
-
 function App() {
+
   return (
     <Router>
       <div className="min-h-screen flex flex-col bg-gradient-to-br from-[#302209] via-[#302209] to-[#302209] pt-6">
