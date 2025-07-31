@@ -235,7 +235,7 @@ const PostDetail = ({ postId }) => {
 3. **Error Handling**: Comprehensive error handling with try-catch blocks
 4. **Filter Support**: All four filter options from the original Swift enum
 5. **JSON-RPC**: Maintains the same JSON-RPC protocol as the original
-6. **Vote Tracking**: Tracks upvotes, downvotes, and viewed posts
+6. **Vote Tracking**: Tracks upvotes, downvotes, and, viewed posts
 
 ## API Endpoints
 
