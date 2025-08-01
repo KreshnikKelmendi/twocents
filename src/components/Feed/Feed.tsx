@@ -5,7 +5,8 @@ import PostCard from './PostCard';
 
 const Feed: React.FC = () => {
   const [posts, setPosts] = useState<Post[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [showLoadingSpinner, setShowLoadingSpinner] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [currentFilter, setCurrentFilter] = useState<TwoCentsFilter>(TwoCentsFilter.TOP_ALL_TIME);
@@ -66,16 +67,27 @@ const Feed: React.FC = () => {
     try {
       setLoading(true);
       setError(null);
+      
+      // Show loading spinner after 500ms delay
+      const loadingTimer = setTimeout(() => {
+        setShowLoadingSpinner(true);
+      }, 500);
+      
       const apiPosts = await fetchPosts(filter);
       setPosts(apiPosts.slice(0, 100));
       if (resetPage) {
         setCurrentPage(1);
       }
+      
+      // Clear the timer and hide spinner if data loads quickly
+      clearTimeout(loadingTimer);
+      setShowLoadingSpinner(false);
     } catch (err: any) {
       setError(`Failed to load posts: ${err.message}`);
       setPosts([]);
     } finally {
       setLoading(false);
+      setShowLoadingSpinner(false);
     }
   };
 
@@ -176,12 +188,10 @@ const Feed: React.FC = () => {
     }
   };
 
-  if (loading) {
+  if (loading && showLoadingSpinner) {
     return (
-      <div className="container max-w-7 mx-auto px-6">
-        <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
-        </div>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
       </div>
     );
   }

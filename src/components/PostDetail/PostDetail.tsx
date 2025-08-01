@@ -323,7 +323,7 @@ const PostDetail: React.FC = () => {
 
       {/* Content */}
       <div className="flex-1">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 sm:py-8">
+        <div className="max-w-6xl mx-auto px-6 sm:px-0 py-4 sm:py-8">
           {/* Main Post */}
           <div className="bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-md border border-white/20 rounded-2xl p-4 sm:p-6 lg:p-8 mb-6 sm:mb-8 shadow-2xl">
             <AuthorInfo author={post.author_meta} size="lg" />

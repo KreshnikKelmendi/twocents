@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from './components/Header/Header';
 import Main from './components/main/Main';
@@ -7,8 +7,18 @@ import Feed from './components/Feed/Feed';
 import PostDetail from './components/PostDetail/PostDetail';
 import UserProfile from './components/UserProfile/UserProfile';
 import Footer from './components/Footer/Footer';
+import LoadingScreen from './components/LoadingScreen/LoadingScreen';
 
 function App() {
+  const [isLoading, setIsLoading] = useState(true);
+
+  const handleLoadingComplete = () => {
+    setIsLoading(false);
+  };
+
+  if (isLoading) {
+    return <LoadingScreen onLoadingComplete={handleLoadingComplete} />;
+  }
 
   return (
     <Router>
