@@ -11,6 +11,7 @@ const Feed: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [currentFilter, setCurrentFilter] = useState<TwoCentsFilter>(TwoCentsFilter.TOP_ALL_TIME);
   const [showMobileFilters, setShowMobileFilters] = useState(false);
+  const [isRestoringState, setIsRestoringState] = useState(false);
   const postsPerPage = 15;
   const navigate = useNavigate();
   const { isUpvoted, isDownvoted, isViewed } = useVoteState();
@@ -26,33 +27,7 @@ const Feed: React.FC = () => {
     localStorage.setItem('feedScrollPosition', JSON.stringify(scrollData));
   };
 
-  const restoreScrollPosition = () => {
-    const savedData = localStorage.getItem('feedScrollPosition');
-    if (savedData) {
-      try {
-        const data = JSON.parse(savedData);
-        // Only restore if data is less than 30 minutes old
-        if (Date.now() - data.timestamp < 30 * 60 * 1000) {
-          const savedFilter = data.currentFilter || TwoCentsFilter.TOP_ALL_TIME;
-          const savedPage = data.currentPage || 1;
-          
-          // Set the filter and page immediately
-          setCurrentFilter(savedFilter);
-          setCurrentPage(savedPage);
-          
-          // Restore scroll position after a delay to ensure DOM is ready
-          setTimeout(() => {
-            window.scrollTo({
-              top: data.scrollY || 0,
-              behavior: 'auto'
-            });
-          }, 100);
-        }
-      } catch (error) {
-        // Error restoring scroll position - continue normally
-      }
-    }
-  };
+
 
   // scroll to top function
   const scrollToTop = () => {
@@ -99,7 +74,28 @@ const Feed: React.FC = () => {
         const data = JSON.parse(savedData);
         if (Date.now() - data.timestamp < 30 * 60 * 1000) {
           // We have valid saved data, restore it
-          restoreScrollPosition();
+          setIsRestoringState(true);
+          const savedFilter = data.currentFilter || TwoCentsFilter.TOP_ALL_TIME;
+          const savedPage = data.currentPage || 1;
+          
+          // Set the filter and page immediately
+          setCurrentFilter(savedFilter);
+          setCurrentPage(savedPage);
+          
+          // Fetch data with the restored filter
+          fetchPostsData(savedFilter, false);
+          
+          // Restore scroll position after a delay to ensure DOM is ready
+          setTimeout(() => {
+            window.scrollTo({
+              top: data.scrollY || 0,
+              behavior: 'auto'
+            });
+            // Clear the saved data after restoration to prevent it from being used again
+            localStorage.removeItem('feedScrollPosition');
+            setIsRestoringState(false);
+          }, 100);
+          
           return; // Don't fetch default data
         }
       } catch (error) {
@@ -116,10 +112,29 @@ const Feed: React.FC = () => {
     };
   }, []);
 
-  // Fetch data when filter changes
+  // Fetch data when filter changes (but only if not restoring from saved state)
   useEffect(() => {
+    // Skip this effect if we're currently restoring state
+    if (isRestoringState) {
+      return;
+    }
+    
+    // Skip this effect on initial mount if we're restoring from saved state
+    const savedData = localStorage.getItem('feedScrollPosition');
+    if (savedData) {
+      try {
+        const data = JSON.parse(savedData);
+        if (Date.now() - data.timestamp < 30 * 60 * 1000) {
+          // We're restoring from saved state, don't trigger this effect
+          return;
+        }
+      } catch (error) {
+        // Continue with normal behavior
+      }
+    }
+    
     fetchPostsData(currentFilter, false);
-  }, [currentFilter]);
+  }, [currentFilter, isRestoringState]);
 
   // Close mobile dropdown when clicking outside
   useEffect(() => {
@@ -192,6 +207,17 @@ const Feed: React.FC = () => {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
+      </div>
+    );
+  }
+
+  if (isRestoringState) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto mb-4"></div>
+          <p className="text-white/70">Restoring your previous view...</p>
+        </div>
       </div>
     );
   }
@@ -327,7 +353,7 @@ const Feed: React.FC = () => {
       </div>
 
       {/* Posts Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mb-8 max-w-7xl mx-auto items-start">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6 mb-8 max-w-7xl mx-auto items-start">
         {currentPosts.map((post, index) => (
           <PostCard
             key={post.uuid}
@@ -358,7 +384,7 @@ const Feed: React.FC = () => {
           <div className="flex gap-1 flex-wrap justify-center">
             {(() => {
               const pages = [];
-              const maxVisiblePages = window.innerWidth < 640 ? 5 : 10; // Show fewer pages on mobile
+              const maxVisiblePages = window.innerWidth < 640 ? 5 : 10; 
               
               if (totalPages <= maxVisiblePages) {
                 // Show all pages if total is small
